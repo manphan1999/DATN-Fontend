@@ -1,8 +1,7 @@
 import {
     useState, useEffect, Button, CancelPresentation, MenuItem, TextField, Box,
-    Modal, Typography, AddBoxIcon, IconButton, CancelIcon, _
+    Modal, Typography, AddBoxIcon, IconButton, CancelIcon, _, useValidator
 } from '../../../ImportComponents/Imports';
-import useValidator from '../../../Valiedate/Validation'
 
 const ModalProtocol = (props) => {
     const {

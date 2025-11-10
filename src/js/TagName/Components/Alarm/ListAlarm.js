@@ -1,22 +1,21 @@
 import {
-    useState, useEffect, _, Typography, Checkbox,
-    Paper, Button, IconButton, BorderColorIcon,
-    AddCardIcon, DeleteForeverIcon, Box, toast
+    useState, useEffect, _, Typography, Checkbox, Paper, Button, BorderColorIcon,
+    AddCardIcon, DeleteForeverIcon, Box, toast, SettingsApplicationsIcon, Loading,
+    ModalSearchChannels, ModalDelete, CustomDataGrid, ModalAddTagAlarm, ModalConfigAlarm,
+    ModalEditApp, socket
 } from '../../../ImportComponents/Imports';
 import { fetchAllTagAlarm, deleteTagAlarm } from "../../../../Services/APIDevice";
-import ModalSearchChannels from '../../../Ultils/Modal/Search/ModalSearchChannels'
-import ModalAddTagAlarm from '../../../Ultils/Modal/Alarm/ModalAddTagAlarm';
-import Loading from '../../../Ultils/Loading/Loading';
-import ModalDelete from '../../../Ultils/Modal/Delete/ModalDelete';
-// import { socket } from '../../../Ultils/Socket/Socket';
-import CustomDataGrid from '../../../ImportComponents/CustomDataGrid'
 
 const ListAlarm = () => {
     const [action, setAction] = useState();
     const [actionAlarm, setactionAlarm] = useState();
     const [openModalAddAlarm, setopenModalAddAlarm] = useState(false);
     const [openModalSearchTag, setopenModalSearchTag] = useState(false);
+    const [openModalAddApp, setopenModalAddApp] = useState(false);
+    const [openModalEditApp, setopenModalEditApp] = useState(false);
+    const [reloadDataApp, setreloadDataApp] = useState(false);
     const [dataModalAlarm, setDataModalAlarm] = useState([]);
+    const [dataModalApp, setDataModalApp] = useState([]);
 
     const [isShowModalDelete, setIsShowModalDelete] = useState(false);
     const [dataModalDelete, setDataModalDelete] = useState([]);
@@ -29,8 +28,6 @@ const ListAlarm = () => {
 
     useEffect(() => {
         fetchTagAlarm();
-        // fetchHistorical();
-        // fetchConfig();
     }, []);
 
     const fetchTagAlarm = async () => {
@@ -40,7 +37,7 @@ const ListAlarm = () => {
         if (response && response.EC === 0 && Array.isArray(response.DT?.DT)) {
             const rowsWithId = response.DT.DT.map((item) => ({
                 id: item._id,
-                tagnameId: item.id,
+                tagnameId: item.tagnameId,
                 name: item.name,
                 deviceId: item.deviceId,
                 deviceName: item.deviceName,
@@ -57,27 +54,32 @@ const ListAlarm = () => {
 
     // mở/đóng Modal Add
     const handleopenModalAddAlarm = () => {
-        setAction('CREATE')
+        setAction('CREATE');
         setopenModalAddAlarm(true);
     }
 
+    const handleopenModalApp = () => {
+        setopenModalAddApp(true);
+    }
+
     const handleEditAlarm = (tagAlarm) => {
-        console.log('Check alarm update: ', tagAlarm)
-        // setSelectionChannel([listAlarm.id]);
+        //  console.log('check tag Alarm update: ', tagAlarm)
         setAction('UPDATE')
         setopenModalAddAlarm(true);
         setDataModalAlarm(tagAlarm);
     };
+
+    const handleCloseModalAddApp = () => { setopenModalAddApp(false); }
+    const handleCloseModalEditApp = () => { setopenModalEditApp(false); setreloadDataApp(true); }
 
     const handleCloseModalAddAlarm = () => {
         setopenModalAddAlarm(false);
         fetchTagAlarm();
     }
     const handleCloseModalSearchTag = () => { setopenModalSearchTag(false); }
-    const handleCloseModalDelete = () => { setIsShowModalDelete(false); }
+    const handleCloseModalDelete = () => { setIsShowModalDelete(false); setSelectedCount(0); }
 
     const handleDeleteTagAlarm = (rawData) => {
-        console.log('check id delete alarm: ', rawData);
         let dataToDelete = [];
         if (rawData) {
             dataToDelete = [{ id: rawData.id, tagnameId: rawData.tagnameId }];
@@ -96,14 +98,13 @@ const ListAlarm = () => {
         setactionAlarm('ALARM');
     };
 
-
     const conformDeleteAlarm = async () => {
         // Gửi xuống cả id và tagnameId
         let res = await deleteTagAlarm({ list: dataModalDelete });
         let serverData = res;
-
         if (+serverData.EC === 0) {
             toast.success(serverData.EM);
+            socket.emit('DELETE ALARM');
             setIsShowModalDelete(false);
             await fetchTagAlarm();
         } else {
@@ -159,22 +160,28 @@ const ListAlarm = () => {
             headerAlign: 'center', align: 'center',
             renderCell: (params) => (
                 <>
-                    <IconButton
-                        sx={{ mr: 2 }}
-                        color="primary"
-                        title="Chỉnh sửa"
-                        onClick={(e) => { e.stopPropagation(); handleEditAlarm(params.row); }}
-                    >
-                        <BorderColorIcon />
-                    </IconButton>
+                    <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 1, height: '100%', }}  >
+                        <Button
+                            variant="contained"
+                            color="primary"
+                            startIcon={<BorderColorIcon />}
+                            sx={{ textTransform: 'none', minWidth: 80 }}
+                            onClick={(e) => { e.stopPropagation(); handleEditAlarm(params.row); }}
+                        >
+                            Sửa
+                        </Button>
 
-                    <IconButton
-                        color="error"
-                        title="Xóa"
-                        onClick={(e) => { e.stopPropagation(); handleDeleteTagAlarm(params.row); }}
-                    >
-                        <DeleteForeverIcon />
-                    </IconButton>
+                        <Button
+                            variant="contained"
+                            color="error"
+                            startIcon={<DeleteForeverIcon />}
+                            sx={{ textTransform: 'none', minWidth: 80 }}
+                            onClick={(e) => { e.stopPropagation(); handleDeleteTagAlarm(params.row); }}
+                        >
+                            Xóa
+                        </Button>
+                    </Box>
+
                 </>
             ),
         }
@@ -190,6 +197,16 @@ const ListAlarm = () => {
                 sx={{ mb: 1.5, textTransform: 'none' }}
             >
                 Thêm Tag
+            </Button>
+
+            <Button
+                variant="contained"
+                color="success"
+                startIcon={<SettingsApplicationsIcon />}
+                onClick={handleopenModalApp}
+                sx={{ mb: 1.5, ml: 1.5, textTransform: 'none' }}
+            >
+                Cấu hình
             </Button>
 
             {selectedCount > 0 && (
@@ -250,6 +267,24 @@ const ListAlarm = () => {
                 conformDeleteAlarm={conformDeleteAlarm}
                 selectedCount={selectedCount}
                 action={actionAlarm}
+            />
+
+            {/* Modal cấu hình app cảnh báo */}
+            <ModalConfigAlarm
+                openModalAddApp={openModalAddApp}
+                handleCloseModalApp={handleCloseModalAddApp}
+                setopenModalEditApp={setopenModalEditApp}
+                setreloadDataApp={setreloadDataApp}
+                reloadDataApp={reloadDataApp}
+                setDataModalApp={setDataModalApp}
+            />
+
+            {/* Modal chỉnh sửa cấu hình app */}
+            <ModalEditApp
+                openModalEditApp={openModalEditApp}
+                dataModalApp={dataModalApp}
+                handleCloseModalApp={handleCloseModalAddApp}
+                handleCloseModalEditApp={handleCloseModalEditApp}
             />
         </div>
     );

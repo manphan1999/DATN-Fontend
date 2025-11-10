@@ -1,4 +1,4 @@
-import { Box, CircularProgress } from "@mui/material";
+import { Box, CircularProgress } from "../../ImportComponents/Imports";
 
 const Loading = ({ show = false, text = "", blur = true }) => {
     if (!show) return null;

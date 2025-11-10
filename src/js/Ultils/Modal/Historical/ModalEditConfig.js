@@ -1,10 +1,8 @@
 import {
-    useState, useEffect,
-    Button, IconButton, Modal, Box, Typography, TextField, CancelIcon, _, MenuItem, toast
+    useState, useEffect, Button, IconButton, Modal, Box, Typography,
+    TextField, CancelIcon, _, MenuItem, toast, useValidator, socket, SaveIcon
 } from '../../../ImportComponents/Imports';
 import { updateConfigHistorical } from '../../../../Services/APIDevice';
-import useValidator from '../../../Valiedate/Validation'
-import { socket } from "../../Socket/Socket";
 
 const ModalEditConfig = (props) => {
     const style = {
@@ -84,11 +82,10 @@ const ModalEditConfig = (props) => {
             return;
         }
         const dataToUpdate = { ...dataConfig };
-        // console.log('check dataToUpdate: ', dataToUpdate)
         let res = await updateConfigHistorical(dataToUpdate)
         if (res && res && res.EC === 0) {
             toast.success(res.EM)
-            socket.emit("CHANGE HISTORICAL TYPE");
+            socket.emit("CHANGE HISTORICAL");
             handleClose()
         } else {
             toast.error(res.EM)
@@ -182,9 +179,10 @@ const ModalEditConfig = (props) => {
                         color="success"
                         disabled={_.isEqual(dataConfig, originalData)}
                         sx={{ width: '150px' }}
+                        startIcon={<SaveIcon />}
                         onClick={() => handleConfirmEdit()}
                     >
-                        <span> Chỉnh Sửa </span>
+                        <span> cập nhật </span>
                     </Button>
                 </Box>
             </Box>

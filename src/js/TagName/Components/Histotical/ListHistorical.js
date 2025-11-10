@@ -1,17 +1,10 @@
 import {
-    useState, useEffect, useMemo,
-    Paper, Button, IconButton,
-    AddCardIcon, DeleteForeverIcon, SettingsApplicationsIcon, toast
+    useState, useEffect, useMemo, Paper, Button, IconButton,
+    AddCardIcon, DeleteForeverIcon, SettingsApplicationsIcon, toast,
+    Loading, CustomDataGrid, socket, ModalDelete, ModalConfigHistorical,
+    ModalEditConfig, ModalSearchChannels, ModalTagHistorical
 } from '../../../ImportComponents/Imports';
 import { fetchAllHistorical, deleteHistorical, fetchConfigHistorical, fetchAllChannels } from "../../../../Services/APIDevice";
-import ModalConfigHistorical from "../../../Ultils/Modal/Historical/ModalConfigHistorical";
-import ModalEditConfig from "../../../Ultils/Modal/Historical/ModalEditConfig";
-import ModalSearchChannels from '../../../Ultils/Modal/Search/ModalSearchChannels'
-import ModalTagHistorical from '../../../Ultils/Modal/Historical/ModalTagHistorical'
-import Loading from '../../../Ultils/Loading/Loading';
-import ModalDelete from '../../../Ultils/Modal/Delete/ModalDelete';
-import { socket } from '../../../Ultils/Socket/Socket';
-import CustomDataGrid from '../../../ImportComponents/CustomDataGrid'
 
 const ListHistorical = () => {
     const [actionHistorical, setActionHistorical] = useState([]);
@@ -69,7 +62,6 @@ const ListHistorical = () => {
             const rows = response.DT.DT.map((item) => ({
                 id: item._id,
                 tagnameId: item.id,
-                channel: item.channel,
                 name: item.name,
                 type: item.type
             }));
@@ -137,7 +129,6 @@ const ListHistorical = () => {
                 }));
             setSelectedCount(dataToDelete.length);
         }
-
         setDataModalDelete(dataToDelete);
         setIsShowModalDelete(true);
         setactionDeleteHistorical('HISTORICAL');
@@ -149,8 +140,8 @@ const ListHistorical = () => {
         let serverData = res;
 
         if (+serverData.EC === 0) {
-            socket.emit("CHANGE HISTORICAL TYPE");
             toast.success(serverData.EM);
+            socket.emit('CHANGE HISTORICAL');
             setIsShowModalDelete(false);
             await fetchHistorical();
         } else {
@@ -161,14 +152,13 @@ const ListHistorical = () => {
 
     const _listHistorical = useMemo(() => {
         return listHistorical.map(his => {
-            // Tìm thông tin channel có cùng tên Tag
             const channelInfo = listChannel.find(ch => ch.name === his.name);
             return {
                 ...his,
-                channel: channelInfo?.channel || '',
-                deviceName: channelInfo?.deviceName || '',
-                symbol: channelInfo?.symbol || '',
-                unit: channelInfo?.unit || '',
+                channel: channelInfo?.channel ?? '',
+                deviceName: channelInfo?.deviceName ?? '',
+                symbol: channelInfo?.symbol ?? '',
+                unit: channelInfo?.unit ?? '',
             };
         });
     }, [listHistorical, listChannel]);

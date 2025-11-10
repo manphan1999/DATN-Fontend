@@ -2,13 +2,9 @@ import {
     useState, useEffect, Paper, dayjs, TextField, Chip, MenuItem,
     Box, Button, IosShareIcon, Stack, FindInPageIcon,
     CheckCircleIcon, ErrorIcon, WarningAmberIcon, SensorsOffIcon, HelpOutlineIcon,
+    useValidator, CustomDataGrid, Loading, CustomDateTimePicker, exportToCSV
 } from '../../ImportComponents/Imports';
 import { fetchAllHistoricalValue, fetchAllHistorical, findHistoricalTime } from '../../../Services/APIDevice'
-import Loading from '../../Ultils/Loading/Loading';
-import CustomDataGrid from '../../ImportComponents/CustomDataGrid';
-import CustomDateTimePicker from '../../Ultils/DateTimePicker/DateTimePicker';
-import useValidator from '../../Valiedate/Validation'
-import exportToCSV from '../../Ultils/ExportCSV/exportCSV';
 
 const ListHistorical = () => {
     const [paginationModel, setPaginationModel] = useState({ page: 0, pageSize: 20 });
@@ -16,6 +12,7 @@ const ListHistorical = () => {
     const [listHistoricalValue, setListHistoricalValue] = useState([]);
     const [listTagHistorical, setListTagHistorical] = useState([]);
     const [selectedTag, setSelectedTag] = useState("");
+    const [isSearchClicked, setIsSearchClicked] = useState(false);
     const [errors, setErrors] = useState({});
     const { validate } = useValidator();
 
@@ -81,8 +78,12 @@ const ListHistorical = () => {
                     });
                 });
             });
-
-            setListHistoricalValue(records);
+            const reversed = records.reverse();
+            const rowsWithNewId = reversed.map((item, index) => ({
+                ...item,
+                id: index + 1,
+            }));
+            setListHistoricalValue(rowsWithNewId);
         }
 
         setLoading(false);
@@ -90,6 +91,8 @@ const ListHistorical = () => {
 
     const handleFindHistorical = async () => {
         if (!validateAll()) return;
+        setIsSearchClicked(true);
+        setLoading(true);
         try {
             const startTime = startDate.format("YYYY-MM-DD HH:mm:ss");
             const endTime = endDate.format("YYYY-MM-DD HH:mm:ss");
@@ -125,6 +128,7 @@ const ListHistorical = () => {
                     }
                 });
                 setListHistoricalValue(dataFinds);
+                setLoading(false);
             }
         } catch (error) {
 
@@ -147,21 +151,21 @@ const ListHistorical = () => {
 
         // Lấy tên từ selectedTag
         const selectedTagObj = listTagHistorical.find(tag => tag.id === selectedTag);
-        const filename = selectedTagObj ? selectedTagObj.name : 'historical_data';
-
+        const tagnamedownload = selectedTagObj ? selectedTagObj.name : 'historical_data';
+        const filename = `Historical ${tagnamedownload} data day_`
         exportToCSV(headers, csvData, filename);
     };
 
     const columns = [
         { field: 'id', headerName: 'STT', width: 100, align: 'center', headerAlign: 'center' },
-        { field: 'timestamp', headerName: 'Ngày và Giờ', width: 250, align: 'center', headerAlign: 'center' },
-        { field: 'tagname', headerName: 'Tên', width: 200, align: 'center', headerAlign: 'center' },
+        { field: 'timestamp', headerName: 'Date and Time', width: 250, align: 'center', headerAlign: 'center' },
+        { field: 'tagname', headerName: 'Name', width: 200, align: 'center', headerAlign: 'center' },
         { field: 'symbol', headerName: 'Symbol', flex: 1, align: 'center', headerAlign: 'center' },
-        { field: 'value', headerName: 'Giá trị', flex: 1, align: 'center', headerAlign: 'center' },
-        { field: 'unit', headerName: 'Đơn vị', flex: 1, align: 'center', headerAlign: 'center' },
+        { field: 'value', headerName: 'Value', flex: 1, align: 'center', headerAlign: 'center' },
+        { field: 'unit', headerName: 'Unit', flex: 1, align: 'center', headerAlign: 'center' },
         {
             field: "status",
-            headerName: "Trạng thái",
+            headerName: "Status",
             width: 250,
             headerAlign: "center",
             align: "center",
@@ -282,7 +286,11 @@ const ListHistorical = () => {
                             height: 'fit-content',
                             minWidth: '120px'
                         }}
-                        disabled={selectedTag === ""}
+                        disabled={
+                            selectedTag === "" ||
+                            !isSearchClicked ||
+                            listHistoricalValue.length === 0
+                        }
                     >
                         Xuất Excel
                     </Button>

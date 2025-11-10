@@ -1,11 +1,10 @@
 import {
-    useState, useEffect, Button, IconButton, Modal, Box, Typography, TextField, CancelPresentation,
-    MenuItem, RadioGroup, Radio, FormControlLabel, CancelIcon, SaveIcon, toast
+    useState, useEffect, Button, IconButton, Modal, Box,
+    Typography, TextField, CancelPresentation, MenuItem,
+    RadioGroup, Radio, FormControlLabel, CancelIcon, SaveIcon,
+    toast, socket, useValidator, Android12Switch, AddBoxIcon
 } from '../../../ImportComponents/Imports';
 import { createNewChannel, updateCurrentChannel } from '../../../../Services/APIDevice';
-import { Android12Switch } from '../../Switch/IconSwitch'
-import useValidator from '../../../Valiedate/Validation'
-import { socket } from '../../Socket/Socket';
 
 const ModalChannel = (props) => {
     const style = {
@@ -158,7 +157,7 @@ const ModalChannel = (props) => {
             : await updateCurrentChannel(dataToSave);
 
         if (res && res.EC === 0) {
-            socket.emit("CREATE TAG");
+            socket.emit('CHANGE TAGNAME');
             toast.success(res.EM);
             handleClose();
         } else {
@@ -512,7 +511,7 @@ const ModalChannel = (props) => {
                             type="submit"
                             variant="contained"
                             color="success"
-                            startIcon={<SaveIcon />}
+                            startIcon={action === 'CREATE' ? <AddBoxIcon /> : <SaveIcon />}
                             sx={{ ml: 1.5, textTransform: 'none' }}
                         >
                             {action === 'CREATE' ? 'Thêm' : 'Cập nhật'}

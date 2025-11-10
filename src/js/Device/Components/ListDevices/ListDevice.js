@@ -1,15 +1,9 @@
 import {
-    useState, useEffect,
-    Paper, Button, IconButton,
-    AddCardIcon, BorderColorIcon, DeleteForeverIcon,
-    toast
+    useState, useEffect, Paper, Button, IconButton, socket,
+    AddCardIcon, BorderColorIcon, DeleteForeverIcon, toast,
+    ModalDelete, ModalProtocol, ModalDevice, Loading, CustomDataGrid
 } from '../../../ImportComponents/Imports';
 import { fetchAllDevices, deleteDevice, fetchAllComs, fetchAllProtocol } from "../../../../Services/APIDevice";
-import ModalDelete from '../../../Ultils/Modal/Delete/ModalDelete';
-import ModalProtocol from '../../../Ultils/Modal/Protocol/ModalProtocol';
-import ModalDevice from '../../../Ultils/Modal/Device/ModalDevice';
-import Loading from '../../../Ultils/Loading/Loading';
-import CustomDataGrid from '../../../ImportComponents/CustomDataGrid';
 
 const ListDevices = (props) => {
     const [paginationModel, setPaginationModel] = useState({ page: 0, pageSize: 5, });
@@ -146,6 +140,7 @@ const ListDevices = (props) => {
         let serverData = res
         if (+serverData.EC === 0) {
             toast.success(serverData.EM)
+            socket.emit('CHANGE DEVICE');
             setisShowModalDelete(false)
             await fetchDevices()
         }
@@ -189,12 +184,14 @@ const ListDevices = (props) => {
                         <IconButton
                             sx={{ mr: 2 }}
                             color="primary"
+                            title="Chỉnh sửa"
                             onClick={(e) => { e.stopPropagation(); handleEditDevice(params.row); }}
                         >
                             <BorderColorIcon />
                         </IconButton>
                         <IconButton
                             color="error"
+                            title="Xóa"
                             onClick={(e) => { e.stopPropagation(); handleDeleteDevice(params.row); }}
                         >
                             <DeleteForeverIcon />

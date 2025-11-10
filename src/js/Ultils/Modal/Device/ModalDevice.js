@@ -1,9 +1,9 @@
 import {
-    useState, useEffect, Button, IconButton, MenuItem, TextField, Box, FormControl, InputLabel, Input, InputAdornment,
-    Modal, Typography, CancelIcon, CancelPresentation, BorderColorIcon, toast, _, Visibility, VisibilityOff
+    useState, useEffect, Button, IconButton, MenuItem, TextField,
+    Box, useValidator, InputAdornment, Modal, Typography, CancelIcon,
+    CancelPresentation, SaveIcon, toast, _, Visibility, VisibilityOff, socket,
 } from '../../../ImportComponents/Imports';
 import { createNewDevice, updateCurrentDevice, fetchAllComs } from '../../../../Services/APIDevice';
-import useValidator from '../../../Valiedate/Validation'
 
 const ModalDevice = (props) => {
     const style = {
@@ -37,15 +37,14 @@ const ModalDevice = (props) => {
     const [listComs, setListComs] = useState([]);
     const [showPassword, setShowPassword] = useState(false);
 
-    const { action, isShowModalDevice, handleCloseModalDevice, dataModalDevice,
-        listProtocol, listModbus, listSiemens, listMqtt } = props;
+    const { action, isShowModalDevice, handleCloseModalDevice,
+        dataModalDevice, listProtocol, listModbus, listSiemens, listMqtt } = props;
 
     useEffect(() => {
         fetchComs();
     }, []);
 
     const fetchComs = async () => {
-
         let response = await fetchAllComs();
         if (response && response.EC === 0 && response.DT?.DT) {
             const rows = response.DT.DT.map((item) => ({
@@ -219,6 +218,7 @@ const ModalDevice = (props) => {
             : await updateCurrentDevice(dataToUpdate);
         if (res && res.EC === 0) {
             toast.success(res.EM);
+            socket.emit('CHANGE DEVICE');
             handleClose();
         } else {
             toast.error(res.EM);
@@ -432,7 +432,7 @@ const ModalDevice = (props) => {
                         <Button
                             variant="contained"
                             color="success"
-                            startIcon={<BorderColorIcon />}
+                            startIcon={<SaveIcon />}
                             sx={{ ml: 1.5, textTransform: 'none' }}
                             type="submit"
                         // disabled={_.isEqual(dataCom, originalData)}

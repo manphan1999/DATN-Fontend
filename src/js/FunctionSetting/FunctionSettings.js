@@ -3,6 +3,7 @@ import {
     IconButton, Box, Button, Paper, LinearProgress,
     AddCardIcon, BorderColorIcon, DeleteForeverIcon, toast,
     CheckCircleIcon, ErrorIcon, WarningAmberIcon, SensorsOffIcon, HelpOutlineIcon,
+    socket, CustomDataGrid, ModalChannel, ModalDelete, Loading, InputPopover
 } from '../ImportComponents/Imports';
 import {
     fetchAllDevices,
@@ -12,12 +13,6 @@ import {
     fetchAllFunctionCode,
     deleteChannel,
 } from "../../Services/APIDevice";
-import ModalChannel from "../Ultils/Modal/TagName/ModalChannel";
-import ModalDelete from "../Ultils/Modal/Delete/ModalDelete";
-import { socket } from "../Ultils/Socket/Socket";
-import Loading from "../Ultils/Loading/Loading";
-import InputPopover from "../Ultils/Popover/Popover";
-import CustomDataGrid from '../ImportComponents/CustomDataGrid'
 
 const FunctionSettings = (props) => {
     const [paginationModel, setPaginationModel] = useState({ page: 0, pageSize: 5, });
@@ -297,12 +292,14 @@ const FunctionSettings = (props) => {
                 <>
                     <IconButton
                         color="primary"
+                        title="Chỉnh sửa"
                         onClick={(e) => { e.stopPropagation(); handleEditChannel(params.row); }}
                     >
                         <BorderColorIcon />
                     </IconButton>
                     <IconButton
                         color="error"
+                        title="Xóa"
                         onClick={(e) => { e.stopPropagation(); handleDeleteDevice(params.row); }}
                     >
                         <DeleteForeverIcon />

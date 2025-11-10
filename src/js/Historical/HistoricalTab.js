@@ -1,7 +1,7 @@
-import { useState } from "react";
-import { Tabs, Tab, Paper, Box } from '../ImportComponents/Imports';
-import HistirocalData from '../Historical/HistoricalData/HistoricalData'
-import HistirocalTrend from '../Historical/HistoricalTrend/HistoricalTrend'
+import { Tabs, Tab, Paper, Box, useState } from '../ImportComponents/Imports';
+import HistoricalData from '../Historical/HistoricalData/HistoricalData'
+import HistoricalAlarm from '../Historical/HistoricalAlarm/HistoricalAlarm'
+import HistoricalTrend from '../Historical/HistoricalTrend/HistoricalTrend'
 
 const TabPanel = (props) => {
     const { children, value, index, ...other } = props;
@@ -44,19 +44,22 @@ const HistoricalTab = () => {
                         sx={{ width: '100%' }}
                     >
                         <Tab sx={{ textTransform: 'none', fontWeight: 'bold', fontSize: 15, whiteSpace: 'nowrap' }} label="Historical Trend Data" />
-                        <Tab sx={{ textTransform: 'none', fontWeight: 'bold', fontSize: 15, whiteSpace: 'nowrap' }} label="Historical List Data" />
+                        <Tab sx={{ textTransform: 'none', fontWeight: 'bold', fontSize: 15, whiteSpace: 'nowrap' }} label="Historical Data" />
+                        <Tab sx={{ textTransform: 'none', fontWeight: 'bold', fontSize: 15, whiteSpace: 'nowrap' }} label="Historical Alarm" />
                     </Tabs>
                 </Box>
             </Paper>
 
 
             <TabPanel value={tabValue} index={0}>
-                <HistirocalTrend />
+                <HistoricalTrend />
             </TabPanel>
             <TabPanel value={tabValue} index={1}>
-                <HistirocalData />
+                <HistoricalData />
             </TabPanel>
-
+            <TabPanel value={tabValue} index={2}>
+                <HistoricalAlarm />
+            </TabPanel>
         </div>
     );
 };

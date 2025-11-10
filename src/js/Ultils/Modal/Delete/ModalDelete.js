@@ -1,7 +1,5 @@
 import {
-    Button, Dialog,
-    DialogTitle,
-    DialogContent,
+    Button, Dialog, DialogTitle, DialogContent,
     DialogActions, Typography, IconButton, CancelIcon, _,
 } from '../../../ImportComponents/Imports';
 

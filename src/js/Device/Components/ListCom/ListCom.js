@@ -1,12 +1,8 @@
 import {
-    useState, useEffect,
-    Paper, IconButton,
-    BorderColorIcon
+    useState, useEffect, Paper, IconButton, BorderColorIcon,
+    ModalCom, Loading, CustomDataGrid
 } from '../../../ImportComponents/Imports';
 import { fetchAllComs } from '../../../../Services/APIDevice'
-import ModalCom from '../../../Ultils/Modal/Com/ModalCom';
-import Loading from '../../../Ultils/Loading/Loading';
-import CustomDataGrid from '../../../ImportComponents/CustomDataGrid';
 
 const ListCom = (props) => {
     const [paginationModel, setPaginationModel] = useState({ page: 0, pageSize: 5, });
@@ -22,7 +18,6 @@ const ListCom = (props) => {
     const fetchComs = async () => {
         setLoading(true);
         let response = await fetchAllComs();
-        console.log('check data com read: ', response)
         if (response && response.EC === 0 && response.DT?.DT) {
             const rowsWithId = response.DT.DT.map((item, index) => ({
                 id: item._id,
@@ -66,6 +61,7 @@ const ListCom = (props) => {
                     {/* stopPropagation để không làm DataGrid thay đổi selection */}
                     <IconButton
                         color="primary"
+                        title="Chỉnh sửa"
                         onClick={(e) => { e.stopPropagation(); handleEditCom(params.row); }}
                     >
                         <BorderColorIcon />

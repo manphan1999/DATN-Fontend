@@ -1,12 +1,9 @@
 import {
-    useState, useEffect,
-    Paper, IconButton, Modal, Box, Typography,
-    BorderColorIcon, CancelIcon,
+    useState, useEffect, Paper, IconButton, Modal, Box, Typography,
+    BorderColorIcon, CancelIcon, Loading, CustomDataGrid
 } from '../../../ImportComponents/Imports';
 import { fetchConfigHistorical } from '../../../../Services/APIDevice';
-import Loading from '../../Loading/Loading';
-import CustomDataGrid
-    from '../../../ImportComponents/CustomDataGrid';
+
 const ModalConfigHistorical = (props) => {
 
     const { openModalConfig, handleCloseModalConfig, handleOpenModalEditConfig, reloadConfig } = props;

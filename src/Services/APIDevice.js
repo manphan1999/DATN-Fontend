@@ -106,6 +106,26 @@ const deleteTagAlarm = (dataDelete) => {
     });
 };
 
+const fetchAllApp = () => {
+    return axios.get(`/api/v1/alarm/get-app`)
+}
+
+const createNewApp = (appNew) => {
+    return axios.post(`/api/v1/alarm/create-app`, appNew)
+}
+
+const updateApp = (app) => {
+    return axios.put(`/api/v1/alarm/update-app`, app)
+}
+
+/* API Alarm Value */
+const fetchAllAlarmValue = () => {
+    return axios.get(`/api/v1/alarm/get-listdata`)
+}
+
+const findAlarmTime = (dateTime) => {
+    return axios.post(`/api/v1/alarm/get-listdata-time`, dateTime)
+}
 
 export {
     fetchAllProtocol,
@@ -113,6 +133,6 @@ export {
     fetchAllComs, updateCurrentCom,
     fetchAllChannels, createNewChannel, updateCurrentChannel, deleteChannel, fetchAllDataFormat, fetchAllDataType, fetchAllFunctionCode,
     fetchAllHistorical, fetchConfigHistorical, createNewHistorical, updateConfigHistorical, deleteHistorical,
-    fetchAllHistoricalValue, findHistoricalTime,
-    fetchAllTagAlarm, createNewAlarm, updateTagAlarm, deleteTagAlarm
+    fetchAllHistoricalValue, findHistoricalTime, fetchAllAlarmValue, findAlarmTime,
+    fetchAllTagAlarm, createNewAlarm, updateTagAlarm, deleteTagAlarm, fetchAllApp, createNewApp, updateApp
 }

@@ -1,5 +1,4 @@
-import { useState } from "react";
-import { Tabs, Tab, Box, Paper } from "@mui/material";
+import { useState, Tabs, Paper, Tab, Box } from '../ImportComponents/Imports';
 import ListDevices from "./Components/ListDevices/ListDevice";
 import ListCom from "./Components/ListCom/ListCom";
 

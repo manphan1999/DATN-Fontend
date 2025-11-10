@@ -1,5 +1,4 @@
-import { useState } from "react";
-import { Tabs, Tab, Box, Paper } from "@mui/material";
+import { useState, Tabs, Paper, Tab, Box } from '../ImportComponents/Imports';
 import ListChannels from "./Components/Monitoring/ListChannels";
 import ListHistorical from "./Components/Histotical/ListHistorical";
 import ListAlarm from "./Components/Alarm/ListAlarm";

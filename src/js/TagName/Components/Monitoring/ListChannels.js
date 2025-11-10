@@ -1,14 +1,16 @@
 import {
-    useState, useEffect,
-    Paper, Button, IconButton,
-    AddCardIcon, BorderColorIcon, DeleteForeverIcon, SettingsApplicationsIcon, toast
+    useState, useEffect, Paper, Button, IconButton,
+    AddCardIcon, BorderColorIcon, DeleteForeverIcon, SettingsApplicationsIcon, toast,
+    ModalChannel, ModalDelete, Loading, CustomDataGrid
 } from '../../../ImportComponents/Imports';
-// import { Android12Switch } from '../../../Ultils/Switch/IconSwitch'
-import { fetchAllDevices, fetchAllChannels, fetchAllDataFormat, fetchAllDataType, fetchAllFunctionCode, deleteChannel } from '../../../../Services/APIDevice';
-import ModalChannel from '../../../Ultils/Modal/TagName/ModalChannel';
-import ModalDelete from '../../../Ultils/Modal/Delete/ModalDelete';
-import Loading from '../../../Ultils/Loading/Loading';
-import CustomDataGrid from '../../../ImportComponents/CustomDataGrid'
+import {
+    fetchAllDevices,
+    fetchAllChannels,
+    fetchAllDataFormat,
+    fetchAllDataType,
+    fetchAllFunctionCode,
+    deleteChannel
+} from '../../../../Services/APIDevice';
 
 const ListChannels = (props) => {
     const [paginationModel, setPaginationModel] = useState({ page: 0, pageSize: 5, });
@@ -148,7 +150,6 @@ const ListChannels = (props) => {
     };
 
     const handleEditChannel = (device) => {
-        // console.log('Check channel update: ', device)
         setSelectionChannel([device.id]);
         setactionModalChannel("EDIT");
         setdataModalChannel(device);
@@ -207,12 +208,14 @@ const ListChannels = (props) => {
                 <>
                     <IconButton
                         color="primary"
+                        title="Chỉnh sửa"
                         onClick={(e) => { e.stopPropagation(); handleEditChannel(params.row); }}
                     >
                         <BorderColorIcon />
                     </IconButton>
                     <IconButton
                         color="error"
+                        title="Xóa"
                         onClick={(e) => { e.stopPropagation(); handleDeleteDevice(params.row); }}
                     >
                         <DeleteForeverIcon />

@@ -1,9 +1,8 @@
 import {
-    useState, useEffect, Button, CancelPresentation, MenuItem, TextField, Box,
-    Modal, Typography, BorderColorIcon, IconButton, CancelIcon, toast, _,
+    useState, useEffect, Button, CancelPresentation, MenuItem, TextField, Box, socket,
+    Modal, Typography, SaveIcon, IconButton, CancelIcon, toast, _, useValidator,
 } from '../../../ImportComponents/Imports';
 import { updateCurrentCom } from '../../../../Services/APIDevice';
-import useValidator from '../../../Valiedate/Validation'
 
 const ModalCom = (props) => {
     const style = {
@@ -92,6 +91,7 @@ const ModalCom = (props) => {
         let res = await updateCurrentCom(dataToUpdate)
         if (res && res && res.EC === 0) {
             toast.success(res.EM)
+            socket.emit('UPDATE COM');
             handleClose()
         } else {
             toast.error(res.EM)
@@ -228,12 +228,12 @@ const ModalCom = (props) => {
                     <Button
                         variant="contained"
                         color="success"
-                        startIcon={<BorderColorIcon />}
+                        startIcon={<SaveIcon />}
                         sx={{ mt: 1.5, ml: 1.5, textTransform: 'none' }}
                         onClick={() => handleConfirmCom()}
                         disabled={_.isEqual(dataCom, originalData)}
                     >
-                        Chỉnh Sửa
+                        Cập nhật
                     </Button>
 
                 </Box>

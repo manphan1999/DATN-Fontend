@@ -1,7 +1,7 @@
-import { useState, useEffect } from "react";
-import { Popover, Button, TextField, Box, FormControlLabel } from "@mui/material";
-import { Android12Switch } from '../Switch/IconSwitch'
-import useValidator from "../../Valiedate/Validation";
+import {
+    useState, useEffect, Popover, Button, TextField,
+    Box, FormControlLabel, Android12Switch, useValidator
+} from '../../ImportComponents/Imports'
 
 const InputPopover = ({
     anchorEl,              // hiển thị popover

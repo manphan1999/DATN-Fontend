@@ -1,9 +1,11 @@
 import {
-    useState, useEffect, Button, IconButton, MenuItem, TextField, Box, FindInPageIcon, InputAdornment,
-    Modal, Typography, CancelIcon, CancelPresentation, BorderColorIcon, toast, _, Checkbox
+    useState, useEffect, Button, IconButton, MenuItem, TextField,
+    Box, FindInPageIcon, InputAdornment, Modal, Typography, CancelIcon,
+    CancelPresentation, AddBoxIcon, toast, _, Checkbox, useValidator,
+    socket, SaveIcon
 } from '../../../ImportComponents/Imports';
 import { createNewAlarm, updateTagAlarm } from '../../../../Services/APIDevice';
-import useValidator from '../../../Valiedate/Validation'
+
 const ModalAddTagAlarm = (props) => {
     const style = {
         position: 'absolute',
@@ -18,7 +20,7 @@ const ModalAddTagAlarm = (props) => {
     };
 
     const defaultDataChoose = {
-        id: '',
+        tagnameId: '',
         name: '',
         deviceId: '',
         deviceName: '',
@@ -31,8 +33,6 @@ const ModalAddTagAlarm = (props) => {
     const { validate } = useValidator();
     const [errors, setErrors] = useState({});
     const [dataAlarm, setDataAlarm] = useState(defaultDataChoose);
-    // const [dataModalAddAlarm, setdataModalAddAlarm] = useState(defaultData);
-    // const [listComs, setListComs] = useState([]);
     const { action, openModalAddAlarm, handleCloseModalAddAlarm,
         setopenModalSearchTag, setactionAlarm, dataModalAlarm } = props;
 
@@ -44,7 +44,15 @@ const ModalAddTagAlarm = (props) => {
                 ...dataModalAlarm,
             }));
         }
-    }, [dataModalAlarm, action]);
+        // console.log('check data was choose: ', dataModalAlarm)
+    }, [dataModalAlarm]);
+
+    useEffect(() => {
+        if (action === 'CREATE') {
+            setDataAlarm(defaultDataChoose);
+            setErrors({});
+        }
+    }, [action]);
 
     const validateAll = () => {
         const newErrors = {};
@@ -74,7 +82,7 @@ const ModalAddTagAlarm = (props) => {
     const handleOnchangeInput = (value, name) => {
         let _dataAlarm = _.cloneDeep(dataAlarm)
         _dataAlarm[name] = value;
-        if (name === 'content' && value.length > 30) {
+        if (name === 'content' && value.length > 40) {
             return;
         }
         setDataAlarm((prev) => ({
@@ -104,20 +112,29 @@ const ModalAddTagAlarm = (props) => {
     }
 
     const handleConfirmAlarm = async () => {
-        console.log('check action: ', action)
-        if (!validateAll()) {
-            return;
+        if (!validateAll()) return;
+        let res;
+        let dataToSave;
+        if (action === 'CREATE') {
+            const { id, ...rest } = dataAlarm;
+            dataToSave = { ...rest, tagnameId: id };
+            res = await createNewAlarm(dataToSave);
         }
-        const res = action === 'CREATE'
-            ? await createNewAlarm(dataAlarm)
-            : await updateTagAlarm(dataAlarm);
+        else if (action === 'UPDATE') {
+            const { tagnameId, ...rest } = dataAlarm;
+            dataToSave = { ...rest, tagnameId: dataAlarm.tagnameId };
+            // console.log('check dataToSave update: ', dataToSave)
+            res = await updateTagAlarm(dataToSave);
+        }
         if (res && res.EC === 0) {
             toast.success(res.EM);
+            socket.emit('CHANGE ALARM');
+            setDataAlarm({});
             handleClose();
         } else {
             toast.error(res.EM);
         }
-    }
+    };
 
     return (
         <Modal open={openModalAddAlarm} onClose={handleClose} onKeyDown={(e) => {
@@ -220,23 +237,19 @@ const ModalAddTagAlarm = (props) => {
                         onChange={(e) => handleOnchangeInput(e.target.value, 'content')}
                         sx={{ gridColumn: 'span 2' }}
                         error={!!errors.content}
-                        helperText={`${dataAlarm.content.length}/30 ký tự`}
+                        helperText={`${dataAlarm.content.length}/40 ký tự`}
                         inputProps={{
-                            maxLength: 30,
+                            maxLength: 40,
                         }}
                     />
 
                     <Box
                         sx={{
-                            display: "flex",
-                            alignItems: "center",       // Căn giữa theo chiều dọc
-                            justifyContent: "center",   // Căn giữa ngang trong form
-                            gap: 5,                     // Khoảng cách giữa các phần
-                            gridColumn: "span 2",
-                            mt: 1,
+                            display: "flex", alignItems: "center",
+                            justifyContent: "center", gap: 5, gridColumn: "span 2", mt: 1,
                         }}
                     >
-                        {/* Nhãn bên trái */}
+
                         <Typography
                             variant="h6"
                             sx={{
@@ -286,12 +299,12 @@ const ModalAddTagAlarm = (props) => {
                         <Button
                             variant="contained"
                             color="success"
-                            startIcon={<BorderColorIcon />}
+                            startIcon={action === 'CREATE' ? <AddBoxIcon /> : <SaveIcon />}
                             sx={{ ml: 1.5, textTransform: 'none' }}
 
                             type="submit"
                         >
-                            {action === 'CREATE' ? 'Thêm' : 'Chỉnh sửa'}
+                            {action === 'CREATE' ? 'Thêm' : 'Cập nhật'}
                         </Button>
 
                     </Box>

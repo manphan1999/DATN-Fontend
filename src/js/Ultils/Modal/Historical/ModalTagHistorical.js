@@ -1,9 +1,8 @@
 import {
-    useState, useEffect,
-    Button, IconButton, Modal, Box, Typography, TextField, CloseIcon, _, MenuItem, toast
+    useState, useEffect, Button, IconButton, Modal, Box, socket,
+    Typography, TextField, CloseIcon, _, MenuItem, toast, useValidator
 } from '../../../ImportComponents/Imports';
 import { updateConfigHistorical } from '../../../../Services/APIDevice';
-import useValidator from '../../../Valiedate/Validation'
 
 const ModalAddHistorical = (props) => {
     const style = {
@@ -81,6 +80,7 @@ const ModalAddHistorical = (props) => {
         let res = await updateConfigHistorical(dataToUpdate)
         if (res && res && res.EC === 0) {
             toast.success(res.EM)
+            socket.emit('CHANGE HISTORICAL');
             handleClose()
         } else {
             toast.error(res.EM)

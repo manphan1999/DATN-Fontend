@@ -1,9 +1,8 @@
 import {
     useState, useEffect, Button, CancelPresentation, MenuItem, TextField, Box,
-    Modal, Typography, BorderColorIcon, IconButton, CancelIcon, toast, _,
+    Modal, Typography, BorderColorIcon, IconButton, CancelIcon, toast, _, useValidator
 } from '../../../ImportComponents/Imports';
 import { updateCurrentCom } from '../../../../Services/APIDevice';
-import useValidator from '../../../Valiedate/Validation'
 
 const ModalConfig = (props) => {
     const style = {

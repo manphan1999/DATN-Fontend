@@ -1,4 +1,4 @@
-export default function useValidator() {
+const useValidator = () => {
     //  Check bắt buộc
     const validateRequired = (value) => {
         return value !== undefined && value !== null && value !== "";
@@ -70,7 +70,6 @@ export default function useValidator() {
             case "cycle":
                 if (!isInteger(value)) return "⚠️ Phải nhập số nguyên!";
                 break;
-
             // --- Number ---
             case "popover":
             case "offset":
@@ -82,6 +81,13 @@ export default function useValidator() {
             case "rangeAlarm":
                 if (!isNumber(value)) return "⚠️ Phải nhập số!";
                 break;
+            case "groupId":
+                if (!/^[a-zA-Z0-9,-]*$/.test(value)) {
+                    return "❌ Chỉ được dùng chữ, số, dấu '-' và dấu ',' để phân tách các Group ID!";
+                }
+                const groups = value.split(',').filter(g => g !== "");
+                if (groups.length === 0) return "⚠️ Phải nhập ít nhất 1 Group ID!";
+                if (groups.length > 5) return "⚠️ Quá số lượng group (tối đa 5)!";
 
             default:
                 return "";
@@ -92,3 +98,6 @@ export default function useValidator() {
     //  Trả về object các hàm để dùng ở ngoài
     return { validate, validateRequired, isNumber, isInteger };
 }
+
+
+export default useValidator

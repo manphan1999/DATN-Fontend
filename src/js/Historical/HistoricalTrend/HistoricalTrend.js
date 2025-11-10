@@ -1,11 +1,8 @@
 import {
-    useState, useEffect, Paper, dayjs, TextField, MenuItem,
+    useState, useEffect, Paper, dayjs, TextField, MenuItem, CustomDateTimePicker, useValidator,
     Box, Button, Stack, FindInPageIcon, Chart, Card, CardContent, Typography
 } from '../../ImportComponents/Imports';
 import { fetchAllHistoricalValue, fetchAllHistorical, findHistoricalTime } from '../../../Services/APIDevice';
-import Loading from '../../Ultils/Loading/Loading';
-import CustomDateTimePicker from '../../Ultils/DateTimePicker/DateTimePicker';
-import useValidator from '../../Valiedate/Validation';
 
 const HistoricalTrend = (props) => {
     const [loading, setLoading] = useState(true);
@@ -39,6 +36,20 @@ const HistoricalTrend = (props) => {
         }
     };
 
+    // const fetchAllHistorical = async () => {
+    //     let response = await fetchAllHistoricalValue();
+    //     console.log('response = ', response)
+    //     if (response && response.EC === 0 && Array.isArray(response.DT)) {
+    //         const dataHistorical = response.DT.map(item => ({
+    //             time: item.ts,
+    //             value: item.value.value,  // lấy giá trị đo
+    //             tagname: item.value.tagname,
+    //             unit: item.value.unit
+    //         }));
+    //         setListHistoricalValue(dataHistorical);
+    //     }
+    // };
+
     const handleFindHistorical = async () => {
         if (!validateAll()) return;
         try {
@@ -49,8 +60,6 @@ const HistoricalTrend = (props) => {
             const tagName = selectedTagObj ? selectedTagObj.name : "";
 
             const response = await findHistoricalTime({ startTime, endTime, tagNameId });
-            console.log('Check data search response for Trend: ', response);
-
             if (response && response.EC === 0 && Array.isArray(response.DT)) {
                 const dataFinds = response.DT.map(item => ({
                     time: item.ts,
@@ -59,13 +68,8 @@ const HistoricalTrend = (props) => {
                     unit: item.value.unit
                 }));
                 setListHistoricalValue(dataFinds);
-                console.log('Check data search for Trend:', dataFinds);
-            } else {
-                setListHistoricalValue([]);
             }
-        } catch (error) {
-            console.error("Error fetching historical:", error);
-        }
+        } catch (error) { }
     };
 
     const chartData = {
@@ -76,7 +80,7 @@ const HistoricalTrend = (props) => {
                         ? listHistoricalValue[0]?.tagname || "Giá trị"
                         : "Giá trị",
                 data: listHistoricalValue.map(item => ({
-                    x: new Date(item.time).getTime(),
+                    x: dayjs(item.time).add(7, 'hour').valueOf(),
                     y: Number(item.value)
                 })),
             },
@@ -99,12 +103,19 @@ const HistoricalTrend = (props) => {
                     }
                 },
                 background: '#fff',
+                parentHeightOffset: 0,
             },
             dataLabels: { enabled: false },
             stroke: { curve: "smooth", width: 2 },
             grid: {
                 borderColor: "#e0e0e0",
                 row: { colors: ["#f9f9f9", "transparent"], opacity: 0.5 },
+                padding: {
+                    bottom: 20,
+                    top: 0,
+                    left: 10,
+                    right: 10,
+                },
             },
             markers: { size: 0, hover: { sizeOffset: 5 } },
             xaxis: {
@@ -116,7 +127,8 @@ const HistoricalTrend = (props) => {
                 },
                 title: {
                     text: "Thời gian",
-                    style: { fontSize: "13px", fontWeight: 500 },
+                    offsetY: 15,
+                    style: { fontSize: "13px", fontWeight: 700 },
                 },
             },
             yaxis: {
@@ -148,10 +160,11 @@ const HistoricalTrend = (props) => {
                 style: { fontSize: "16px", fontWeight: "bold", color: "#263238" },
             },
             subtitle: {
-                text: `(${startDate.format("DD/MM/YYYY")} - ${endDate.format("DD/MM/YYYY")})`,
+                text: `(${startDate.format("DD/MM/YYYY HH:mm:ss")} - ${endDate.format("DD/MM/YYYY HH:mm:ss")})`,
                 align: "center",
-                style: { fontSize: "13px", color: "#757575" },
+                style: { fontSize: "13px", color: "#757575", fontFamily: 'Roboto, sans-serif', marginTop: '5px' }
             },
+
         },
     };
 
@@ -215,11 +228,16 @@ const HistoricalTrend = (props) => {
                 </Stack>
             </Paper>
 
-            <Card sx={{ maxWidth: 800, margin: "30px auto", boxShadow: 3 }}>
+            <Card sx={{
+                maxWidth: '100%',
+                margin: "30px auto",
+                boxShadow: 3,
+                p: 0,
+                mb: 2,
+                borderRadius: 2,
+                filter: 'drop-shadow(0 0 8px rgba(0,0,0,0.25))',
+            }}>
                 <CardContent>
-                    <Typography variant="h6" align="center" gutterBottom>
-                        Biểu đồ giá trị Tag: {listHistoricalValue[0]?.tagname || "—"}
-                    </Typography>
                     {listHistoricalValue.length > 0 ? (
                         <Chart
                             options={chartData.options}
@@ -229,7 +247,7 @@ const HistoricalTrend = (props) => {
                         />
                     ) : (
                         <Typography align="center" color="text.secondary">
-                            Chưa có dữ liệu hiển thị
+                            Không có dữ liệu
                         </Typography>
                     )}
                 </CardContent>

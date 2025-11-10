@@ -1,14 +1,10 @@
 import {
-    useState, useEffect,
-    Paper, Button, IconButton, Modal, Box, Typography, InputAdornment, TextField,
-    AddBoxIcon, SearchIcon, CancelIcon, CancelPresentation, MenuItem,
-    toast
+    useState, useEffect, Paper, Button, IconButton, Modal, Box,
+    Typography, InputAdornment, TextField, AddBoxIcon, SearchIcon,
+    CancelIcon, CancelPresentation, MenuItem, toast,
+    Loading, useValidator, socket, CustomDataGrid
 } from '../../../ImportComponents/Imports';
 import { fetchAllChannels, createNewHistorical } from '../../../../Services/APIDevice';
-import Loading from '../../Loading/Loading';
-import useValidator from '../../../Valiedate/Validation'
-import { socket } from '../../Socket/Socket';
-import CustomDataGrid from '../../../ImportComponents/CustomDataGrid';
 
 const ModalSearchChannels = (props) => {
     const { actionHistorical, openModalAdd, handleCloseModalAdd, dataConfig,
@@ -106,6 +102,7 @@ const ModalSearchChannels = (props) => {
         if (!validateAll()) {
             return;
         }
+        //console.log('check row add historical: ', row.id)
         const selectedData = filteredList
             .filter((row) => selectedRows.includes(row.id))
             .map((row) => ({
@@ -120,7 +117,7 @@ const ModalSearchChannels = (props) => {
             : []
         if (res && res.EC === 0) {
             toast.success(res.EM);
-            socket.emit("CHANGE HISTORICAL TYPE");
+            socket.emit("CHANGE HISTORICAL");
             handleClose();
         } else {
             toast.error(res.EM);
