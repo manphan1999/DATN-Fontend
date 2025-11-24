@@ -1,7 +1,7 @@
 import {
     useState, useEffect, Paper, Button, IconButton, Modal, Box,
     Typography, CancelIcon, CancelPresentation,
-    Loading, CustomDataGrid
+    Loading, CustomDataGrid, BorderColorIcon
 } from '../../../ImportComponents/Imports';
 import { fetchAllApp } from '../../../../Services/APIDevice';
 
@@ -16,7 +16,7 @@ const ModalConfigAlarm = (props) => {
         borderRadius: 2,
         boxShadow: 24,
         p: 3,
-        maxHeight: '90vh', // chiều cao tối đa theo viewport
+        maxHeight: '90vh',
         overflowY: 'auto',
     };
 
@@ -79,6 +79,7 @@ const ModalConfigAlarm = (props) => {
                     variant="contained"
                     color="primary"
                     sx={{ textTransform: 'capitalize' }}
+                    startIcon={<BorderColorIcon />}
                     onClick={(e) => { e.stopPropagation(); handleOpenEditApp(params.row); }}
                 >
                     Sửa

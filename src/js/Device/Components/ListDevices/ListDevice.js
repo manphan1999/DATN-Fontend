@@ -1,5 +1,5 @@
 import {
-    useState, useEffect, Paper, Button, IconButton, socket,
+    useState, useEffect, Paper, Button, Box, socket,
     AddCardIcon, BorderColorIcon, DeleteForeverIcon, toast,
     ModalDelete, ModalProtocol, ModalDevice, Loading, CustomDataGrid
 } from '../../../ImportComponents/Imports';
@@ -171,7 +171,7 @@ const ListDevices = (props) => {
         {
             field: 'action',
             headerName: 'Action',
-            flex: 1,
+            width: 190,
             headerAlign: 'center',
             align: 'center',
             renderCell: (params) => {
@@ -181,21 +181,27 @@ const ListDevices = (props) => {
                 }
                 return (
                     <>
-                        <IconButton
-                            sx={{ mr: 2 }}
-                            color="primary"
-                            title="Chỉnh sửa"
-                            onClick={(e) => { e.stopPropagation(); handleEditDevice(params.row); }}
-                        >
-                            <BorderColorIcon />
-                        </IconButton>
-                        <IconButton
-                            color="error"
-                            title="Xóa"
-                            onClick={(e) => { e.stopPropagation(); handleDeleteDevice(params.row); }}
-                        >
-                            <DeleteForeverIcon />
-                        </IconButton>
+                        <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 1, height: '100%', }}  >
+                            <Button
+                                variant="contained"
+                                color="primary"
+                                startIcon={<BorderColorIcon />}
+                                sx={{ textTransform: 'none', minWidth: 80 }}
+                                onClick={(e) => { e.stopPropagation(); handleEditDevice(params.row); }}
+                            >
+                                Sửa
+                            </Button>
+
+                            <Button
+                                variant="contained"
+                                color="error"
+                                startIcon={<DeleteForeverIcon />}
+                                sx={{ textTransform: 'none', minWidth: 80 }}
+                                onClick={(e) => { e.stopPropagation(); handleDeleteDevice(params.row); }}
+                            >
+                                Xóa
+                            </Button>
+                        </Box>
                     </>
                 );
             },

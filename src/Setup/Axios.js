@@ -2,9 +2,10 @@ import axios from "axios";
 import { toast } from '../js/ImportComponents/Imports';
 
 const instance = axios.create({
+    //baseURL: "http://raspberrypi:8080",
     baseURL: "http://localhost:8080",
     timeout: 10000,
-    // baseURL: "http://100.75.114.18:8080",
+
 });
 
 instance.interceptors.request.use(

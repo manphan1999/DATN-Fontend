@@ -1,5 +1,5 @@
 import {
-    useState, useEffect, Paper, IconButton, BorderColorIcon,
+    useState, useEffect, Paper, Box, Button, BorderColorIcon,
     ModalCom, Loading, CustomDataGrid
 } from '../../../ImportComponents/Imports';
 import { fetchAllComs } from '../../../../Services/APIDevice'
@@ -54,18 +54,21 @@ const ListCom = (props) => {
         {
             field: 'action',
             headerName: 'Action',
-            flex: 1,
+            width: 190,
             headerAlign: 'center', align: 'center',
             renderCell: (params) => (
                 <>
-                    {/* stopPropagation để không làm DataGrid thay đổi selection */}
-                    <IconButton
-                        color="primary"
-                        title="Chỉnh sửa"
-                        onClick={(e) => { e.stopPropagation(); handleEditCom(params.row); }}
-                    >
-                        <BorderColorIcon />
-                    </IconButton>
+                    <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 1, height: '100%', }}  >
+                        <Button
+                            variant="contained"
+                            color="primary"
+                            startIcon={<BorderColorIcon />}
+                            sx={{ textTransform: 'none', minWidth: 80 }}
+                            onClick={(e) => { e.stopPropagation(); handleEditCom(params.row); }}
+                        >
+                            Sửa
+                        </Button>
+                    </Box>
                 </>
             ),
         },

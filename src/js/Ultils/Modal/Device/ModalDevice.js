@@ -16,6 +16,8 @@ const ModalDevice = (props) => {
         borderRadius: 2,
         boxShadow: 24,
         p: 2.5,
+        maxHeight: '90vh',
+        overflowY: 'auto',
     };
 
     const defaultData = {

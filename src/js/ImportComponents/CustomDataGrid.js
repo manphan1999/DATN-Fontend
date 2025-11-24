@@ -40,7 +40,7 @@ const CustomDataGrid = ({ sx = {}, ...props }) => {
             margin: '0 8px',
         },
         '& .MuiDataGrid-columnHeaders': {
-            backgroundColor: '#968d8d',
+            backgroundColor: '#908d96ff',
             color: '#fff',
             fontWeight: 'bold',
             fontSize: '15px',

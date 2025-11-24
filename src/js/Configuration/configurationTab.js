@@ -1,6 +1,7 @@
 import { useState, Tabs, Paper, Tab, Box } from '../ImportComponents/Imports';
-import ListDevices from "./Components/ListDevices/ListDevice";
-import ListCom from "./Components/ListCom/ListCom";
+import ListFTP from './FTP/FTP';
+import ListMySQL from './MySQL/MySQl';
+import ListSQL from './SQL/SQL';
 
 const TabPanel = (props) => {
     const { children, value, index, ...other } = props;
@@ -19,7 +20,7 @@ const TabPanel = (props) => {
     );
 };
 
-const DeviceTab = () => {
+const SendTab = () => {
     const [tabValue, setTabValue] = useState(0);
 
     const handleChange = (event, newValue) => {
@@ -42,22 +43,25 @@ const DeviceTab = () => {
                         variant="fullWidth"
                         sx={{ width: '100%' }}
                     >
-                        <Tab sx={{ textTransform: 'none', fontWeight: 'bold', fontSize: 15, whiteSpace: 'nowrap' }} label="Cấu hình Device" />
-                        <Tab sx={{ textTransform: 'none', fontWeight: 'bold', fontSize: 15, whiteSpace: 'nowrap' }} label="Cấu hình COM" />
+                        <Tab sx={{ textTransform: 'none', fontWeight: 'bold', fontSize: 15, whiteSpace: 'nowrap' }} label="Cấu hình FTP" />
+                        <Tab sx={{ textTransform: 'none', fontWeight: 'bold', fontSize: 15, whiteSpace: 'nowrap' }} label="Cấu hình MySQL" />
+                        <Tab sx={{ textTransform: 'none', fontWeight: 'bold', fontSize: 15, whiteSpace: 'nowrap' }} label="Cấu hình SQL" />
                     </Tabs>
                 </Box>
             </Paper>
 
-
             <TabPanel value={tabValue} index={0}>
-                <ListDevices />
+                <ListFTP />
             </TabPanel>
             <TabPanel value={tabValue} index={1}>
-                <ListCom />
+                <ListMySQL />
+            </TabPanel>
+            <TabPanel value={tabValue} index={2}>
+                <ListSQL />
             </TabPanel>
 
         </div>
     );
 };
 
-export default DeviceTab;
+export default SendTab;

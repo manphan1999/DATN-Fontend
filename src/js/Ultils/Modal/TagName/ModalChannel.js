@@ -12,14 +12,15 @@ const ModalChannel = (props) => {
         top: '50%',
         left: '50%',
         transform: 'translate(-50%, -50%)',
-        width: '90vw', // dùng % thay vì fix px, tự scale theo màn hình
-        maxWidth: 600, // không vượt quá 600px trên màn hình lớn
+        width: '90vw',
+        maxWidth: 600,
         bgcolor: '#fff',
         borderRadius: 2,
         boxShadow: 24,
-        p: 2.5,
-        maxHeight: '90vh', // chiều cao tối đa theo viewport
-        overflowY: 'auto', // bật scroll dọc khi vượt quá maxHeight
+        px: 2.5,
+        py: 1,
+        maxHeight: '90vh',
+        overflowY: 'auto',
     };
 
     const defaultData = {
@@ -30,33 +31,60 @@ const ModalChannel = (props) => {
         unit: '',
         offset: '',
         gain: '',
-        lowSet: '',
-        highSet: '',
         slaveId: '',
         functionCode: null,
         address: '',
+        topic: '',
         dataFormat: null,
         dataType: null,
         functionText: '',
         permission: false,
         selectFTP: false,
+        selectMySQL: false,
+        selectSQL: false,
     };
 
     const [dataChannels, setDataChannels] = useState(defaultData);
     const [errors, setErrors] = useState({});
     const { validate } = useValidator();
     const { action, actionFuncSetting, isShowModalChannel, handleCloseModalChannel, dataModalChannel,
-        listDevices, listDataFormat, listDataType, listFunctionCode } = props;
+        listDevices, listDataFormat, listDataType, listFunctionCodeModbus = [], listFunctionCodeMQTT = [] } = props;
+
+    // Hàm lấy protocol của device hiện tại
+    const getCurrentDeviceProtocol = () => {
+        if (!dataChannels.device) return null;
+        const selectedDevice = (listDevices || []).find(device => device.id === dataChannels.device._id);
+        return selectedDevice ? selectedDevice.protocol : null;
+    };
+
+    // Hàm lấy danh sách function code theo device được chọn
+    const getFunctionCodeList = (deviceId = null) => {
+        if (!deviceId) return [];
+
+        const selectedDevice = (listDevices || []).find(device => device.id === deviceId);
+
+        if (selectedDevice) {
+            if (selectedDevice.protocol === "MQTT") {
+                return listFunctionCodeMQTT || [];
+            } else {
+                // Mặc định là Modbus
+                return listFunctionCodeModbus || [];
+            }
+        }
+
+        return [];
+    };
 
     useEffect(() => {
         if (isShowModalChannel) {
-            // console.log('check data tag name from list: ', actionFuncSetting)
             setErrors({});
             if (action === 'EDIT' && dataModalChannel) {
-                const func = listFunctionCode.find(f => f.id === dataModalChannel.functionCodeId);
-                const format = listDataFormat.find(d => d.id === dataModalChannel.dataFormatId);
-                const type = listDataType.find(t => t.id === dataModalChannel.dataTypeId);
-                const device = listDevices.find(d => d.name === dataModalChannel.deviceName);
+                // Sử dụng hàm getFunctionCodeList với deviceId cụ thể
+                const functionCodesForDevice = getFunctionCodeList(dataModalChannel.deviceId);
+                const func = functionCodesForDevice.find(f => f.id === dataModalChannel.functionCodeId);
+                const format = (listDataFormat || []).find(d => d.id === dataModalChannel.dataFormatId);
+                const type = (listDataType || []).find(t => t.id === dataModalChannel.dataTypeId);
+                const device = (listDevices || []).find(d => d.name === dataModalChannel.deviceName);
 
                 setDataChannels({
                     id: dataModalChannel.id,
@@ -67,16 +95,17 @@ const ModalChannel = (props) => {
                     unit: dataModalChannel.unit,
                     offset: dataModalChannel.offset,
                     gain: dataModalChannel.gain,
-                    lowSet: dataModalChannel.lowSet,
-                    highSet: dataModalChannel.highSet,
                     slaveId: dataModalChannel.slaveId,
                     functionCode: func ? func.id : null,
                     address: dataModalChannel.address,
+                    topic: dataModalChannel.topic || '',
                     dataFormat: format ? format.id : null,
                     dataType: type ? type.id : null,
                     functionText: dataModalChannel.functionText,
                     permission: dataModalChannel.permission,
-                    selectFTP: dataModalChannel.selectFTP
+                    selectFTP: dataModalChannel.selectFTP,
+                    selectMySQL: dataModalChannel.selectMySQL,
+                    selectSQL: dataModalChannel.selectSQL
                 });
             }
             if (action === 'CREATE') {
@@ -99,13 +128,11 @@ const ModalChannel = (props) => {
     };
 
     const handleInputChange = (value, name) => {
-        // Cập nhật giá trị dataChannels
         setDataChannels((prev) => ({
             ...prev,
             [name]: value,
         }));
 
-        // Validate ngay khi người dùng nhập và cập nhật errors theo field
         const errorMessage = validate(name, value);
         setErrors((prev) => ({
             ...prev,
@@ -113,33 +140,93 @@ const ModalChannel = (props) => {
         }));
     };
 
+    // Hàm xử lý khi thay đổi device
+    const handleDeviceChange = (deviceId) => {
+        const device = (listDevices || []).find(d => d.id === deviceId);
+        if (device) {
+            setDataChannels(prev => ({
+                ...prev,
+                device: { _id: device.id, name: device.name },
+                functionCode: '', // Reset function code khi đổi device
+                slaveId: device.protocol === 'MQTT' ? '' : prev.slaveId, // Reset slaveId nếu là MQTT
+                address: device.protocol === 'MQTT' ? '' : prev.address, // Reset address nếu là MQTT
+                topic: device.protocol === 'Modbus' ? '' : prev.topic, // Reset topic nếu là Modbus
+                dataFormat: '', // Reset data format
+                dataType: '' // Reset data type
+            }));
+        }
+    };
+
     const validateAll = () => {
         const newErrors = {};
-        Object.entries(dataChannels).forEach(([key, value]) => {
-            if (key === "functionText" || key === "unit") {
-                newErrors[key] = ""; // bỏ qua kiểm tra
+        const currentProtocol = getCurrentDeviceProtocol();
+
+        // Danh sách tất cả các trường cần validate
+        const fieldsToValidate = [
+            'channel', 'name', 'device', 'symbol', 'unit', 'offset', 'gain',
+            'slaveId', 'functionCode', 'address', 'topic', 'dataFormat', 'dataType',
+            'functionText', 'permission', 'selectFTP', 'selectMySQL', 'selectSQL'
+        ];
+
+        fieldsToValidate.forEach(key => {
+            let shouldValidate = true;
+
+            // Các trường không bao giờ validate
+            if (key === 'unit' || key === 'functionText') {
+                shouldValidate = false;
             }
-            else if (key === "dataType" && Number(dataChannels.dataFormat) <= 2) {
+
+            // Các trường bắt buộc chung: channel, name, device, functionCode, symbol
+            if (['channel', 'name', 'device', 'functionCode', 'symbol'].includes(key)) {
+                shouldValidate = true;
+            }
+
+            // Xử lý theo protocol
+            if (currentProtocol === 'Modbus') {
+                // Modbus: validate slaveId, address
+                if (key === 'slaveId' || key === 'address') {
+                    shouldValidate = true;
+                }
+                // Modbus: validate dataFormat, offset, gain nếu functionCode phù hợp
+                if (key === 'dataFormat' || key === 'offset' || key === 'gain') {
+                    shouldValidate = (Number(dataChannels.functionCode) > 2 && Number(dataChannels.functionCode) !== 5);
+                }
+                // Modbus: validate dataType nếu dataFormat > 2 và functionCode phù hợp
+                if (key === 'dataType') {
+                    shouldValidate = (Number(dataChannels.functionCode) > 2 && Number(dataChannels.functionCode) !== 5) && Number(dataChannels.dataFormat) > 2;
+                }
+                // Modbus: không validate topic
+                if (key === 'topic') {
+                    shouldValidate = false;
+                }
+            } else if (currentProtocol === 'MQTT') {
+                // MQTT: validate topic
+                if (key === 'topic') {
+                    shouldValidate = true;
+                }
+                // MQTT: không validate các trường Modbus
+                if (['slaveId', 'address', 'dataFormat', 'dataType', 'offset', 'gain'].includes(key)) {
+                    shouldValidate = false;
+                }
+            } else {
+                // Nếu chưa có protocol, chỉ validate các trường bắt buộc chung
+                if (!['channel', 'name', 'device', 'functionCode', 'symbol'].includes(key)) {
+                    shouldValidate = false;
+                }
+            }
+
+            if (shouldValidate) {
+                newErrors[key] = validate(key, dataChannels[key]);
+            } else {
                 newErrors[key] = "";
-            }
-            else if (
-                ["dataFormat", "offset", "gain", "lowSet", "highSet"].includes(key) &&
-                !(Number(dataChannels.functionCode) > 2 && Number(dataChannels.functionCode) !== 5)
-            ) {
-                newErrors[key] = "";
-            }
-            else {
-                newErrors[key] = validate(key, value);
             }
         });
 
         setErrors(newErrors);
         return Object.values(newErrors).every(err => err === "");
     };
-
     const handleConfirmChannel = async () => {
         if (!validateAll()) {
-            // alert('Check Validate again');
             return;
         }
 
@@ -167,25 +254,25 @@ const ModalChannel = (props) => {
 
     const getDataTypeOptionsByFormat = () => {
         const formatId = Number(dataChannels.dataFormat);
-        // console.log('Check formatId: ', formatId)
-        // console.log('Check listDataType: ', listDataType)
         switch (formatId) {
             case 3: // 32-bit Signed
-                return listDataType.filter(item => [7, 8, 9, 10].includes(Number(item._id || item.id)));
+                return (listDataType || []).filter(item => [7, 8, 9, 10].includes(Number(item._id || item.id)));
             case 4: // 32-bit Unsigned
-                return listDataType.filter(item => [11, 12, 13, 14].includes(Number(item._id || item.id)));
+                return (listDataType || []).filter(item => [11, 12, 13, 14].includes(Number(item._id || item.id)));
             case 5: // 32-bit Float
-                return listDataType.filter(item => [3, 4, 5, 6].includes(Number(item._id || item.id)));
+                return (listDataType || []).filter(item => [3, 4, 5, 6].includes(Number(item._id || item.id)));
             case 6: // 64-bit Signed
-                return listDataType.filter(item => [15, 16, 17, 18].includes(Number(item._id || item.id)));
+                return (listDataType || []).filter(item => [15, 16, 17, 18].includes(Number(item._id || item.id)));
             case 7: // 64-bit Unsigned
-                return listDataType.filter(item => [19, 20, 21, 22].includes(Number(item._id || item.id)));
+                return (listDataType || []).filter(item => [19, 20, 21, 22].includes(Number(item._id || item.id)));
             case 8: // 64-bit Double
-                return listDataType.filter(item => [23, 24, 25, 26].includes(Number(item._id || item.id)));
+                return (listDataType || []).filter(item => [23, 24, 25, 26].includes(Number(item._id || item.id)));
             default:
                 return [];
         }
     };
+
+    const currentProtocol = getCurrentDeviceProtocol();
 
     return (
         <Modal open={isShowModalChannel}
@@ -211,7 +298,7 @@ const ModalChannel = (props) => {
                     sx={{
                         position: "absolute",
                         right: 20,
-                        top: 20,
+                        top: 5,
                         width: { xs: 36, md: 48 },
                         height: { xs: 36, md: 48 },
                     }}
@@ -226,7 +313,7 @@ const ModalChannel = (props) => {
                     gridTemplateColumns="1fr 1fr"
                     gap={2}
                     onSubmit={(e) => {
-                        e.preventDefault(); // chặn reload trang
+                        e.preventDefault();
                         handleConfirmChannel();
                     }}
                 >
@@ -257,16 +344,11 @@ const ModalChannel = (props) => {
                         label="Device"
                         variant="standard"
                         value={dataChannels.device?._id || ""}
-                        onChange={(e) => {
-                            const device = listDevices.find(d => d.id === e.target.value);
-                            if (device) {
-                                handleInputChange({ _id: device.id, name: device.name }, "device");
-                            }
-                        }}
+                        onChange={(e) => handleDeviceChange(e.target.value)}
                         error={!!errors.device}
                         helperText={errors.device}
                     >
-                        {listDevices.map((item) => (
+                        {(listDevices || []).map((item) => (
                             <MenuItem key={item.id} value={item.id}>
                                 {item.name}
                             </MenuItem>
@@ -282,12 +364,12 @@ const ModalChannel = (props) => {
                         value={dataChannels.functionCode || ""}
                         onChange={(e) => {
                             const funcId = Number(e.target.value);
-                            const func = listFunctionCode.find(f => f.id === funcId);
+                            const functionCodes = getFunctionCodeList(dataChannels.device?._id);
+                            const func = functionCodes.find(f => f.id === funcId);
                             if (func) {
                                 setDataChannels((prev) => ({
                                     ...prev,
                                     functionCode: func.id,
-                                    // Nếu functionCode <= 2 hoặc = 5 thì clear luôn dataFormat và dataType
                                     dataFormat: (funcId > 2 && funcId !== 5) ? prev.dataFormat : '',
                                     dataType: (funcId > 2 && funcId !== 5) ? prev.dataType : ''
                                 }));
@@ -296,65 +378,85 @@ const ModalChannel = (props) => {
                         error={!!errors.functionCode}
                         helperText={errors.functionCode}
                     >
-                        {listFunctionCode.map((item) => (
+                        {(getFunctionCodeList(dataChannels.device?._id) || []).map((item) => (
                             <MenuItem key={item.id} value={item.id}>
                                 {item.name}
                             </MenuItem>
                         ))}
                     </TextField>
 
-                    {/* Slave Id */}
-                    <TextField
-                        label="Slave Id"
-                        value={dataChannels.slaveId}
-                        variant="standard"
-                        onChange={(e) => handleInputChange(e.target.value, 'slaveId')}
-                        error={!!errors.slaveId}
-                        helperText={errors.slaveId}
-                    />
+                    {/* Hiển thị các field theo protocol */}
+                    {currentProtocol === 'Modbus' && (
+                        <>
+                            {/* Slave Id - chỉ hiển thị cho Modbus */}
+                            <TextField
+                                label="Slave Id"
+                                value={dataChannels.slaveId}
+                                variant="standard"
+                                onChange={(e) => handleInputChange(e.target.value, 'slaveId')}
+                                error={!!errors.slaveId}
+                                helperText={errors.slaveId}
+                            />
 
-                    {/* Address */}
-                    <TextField
-                        label="Address"
-                        value={dataChannels.address}
-                        variant="standard"
-                        onChange={(e) => handleInputChange(e.target.value, 'address')}
-                        error={!!errors.address}
-                        helperText={errors.address}
-                    />
+                            {/* Address - chỉ hiển thị cho Modbus */}
+                            <TextField
+                                label="Address"
+                                value={dataChannels.address}
+                                variant="standard"
+                                onChange={(e) => handleInputChange(e.target.value, 'address')}
+                                error={!!errors.address}
+                                helperText={errors.address}
+                            />
 
-                    {/* Data Format */}
-                    {(Number(dataChannels.functionCode) > 2 && Number(dataChannels.functionCode) !== 5) && (
-                        <TextField
-                            select
-                            fullWidth
-                            label="Data Format"
-                            value={dataChannels.dataFormat || ""}
-                            variant="standard"
-                            onChange={(e) => {
-                                const formatId = Number(e.target.value);
-                                const format = listDataFormat.find(d => d.id === formatId);
-                                if (format) {
-                                    setDataChannels(prev => ({
-                                        ...prev,
-                                        dataFormat: format.id,
-                                        dataType: formatId > 2 ? prev.dataType : ''
-                                    }));
-                                }
-                            }}
-                            error={!!errors.dataFormat}
-                            helperText={errors.dataFormat}
-                        >
-                            {listDataFormat.map((item) => (
-                                <MenuItem key={item.id} value={item.id}>
-                                    {item.name}
-                                </MenuItem>
-                            ))}
-                        </TextField>
+                            {/* Data Format - chỉ hiển thị cho Modbus với function code phù hợp */}
+                            {(Number(dataChannels.functionCode) > 2 && Number(dataChannels.functionCode) !== 5) && (
+                                <TextField
+                                    select
+                                    fullWidth
+                                    label="Data Format"
+                                    value={dataChannels.dataFormat || ""}
+                                    variant="standard"
+                                    onChange={(e) => {
+                                        const formatId = Number(e.target.value);
+                                        const format = (listDataFormat || []).find(d => d.id === formatId);
+                                        if (format) {
+                                            setDataChannels(prev => ({
+                                                ...prev,
+                                                dataFormat: format.id,
+                                                dataType: formatId > 2 ? prev.dataType : ''
+                                            }));
+                                        }
+                                    }}
+                                    error={!!errors.dataFormat}
+                                    helperText={errors.dataFormat}
+                                >
+                                    {(listDataFormat || []).map((item) => (
+                                        <MenuItem key={item.id} value={item.id}>
+                                            {item.name}
+                                        </MenuItem>
+                                    ))}
+                                </TextField>
+                            )}
+                        </>
                     )}
 
-                    {/* Data Type */}
-                    {Number(dataChannels.dataFormat) > 2 && (
+                    {currentProtocol === 'MQTT' && (
+                        <>
+                            {/* Topic - chỉ hiển thị cho MQTT */}
+                            <TextField
+                                label="Topic"
+                                value={dataChannels.topic}
+                                variant="standard"
+                                onChange={(e) => handleInputChange(e.target.value, 'topic')}
+                                error={!!errors.topic}
+                                helperText={errors.topic}
+                                sx={{ gridColumn: 'span 2' }} // Chiếm 2 cột
+                            />
+                        </>
+                    )}
+
+                    {/* Data Type - chỉ hiển thị cho Modbus với data format phù hợp */}
+                    {currentProtocol === 'Modbus' && Number(dataChannels.dataFormat) > 2 && (
                         <TextField
                             select
                             fullWidth
@@ -370,7 +472,6 @@ const ModalChannel = (props) => {
                                     {item.name}
                                 </MenuItem>
                             ))}
-
                         </TextField>
                     )}
 
@@ -384,7 +485,18 @@ const ModalChannel = (props) => {
                         helperText={errors.symbol}
                     />
 
-                    {(Number(dataChannels.functionCode) > 2 && Number(dataChannels.functionCode) !== 5) && (
+                    {/* Unit - Hiển thị cho cả MQTT và Modbus */}
+                    {currentProtocol === 'MQTT' && (
+                        <TextField
+                            label="Unit"
+                            value={dataChannels.unit}
+                            variant="standard"
+                            onChange={(e) => handleInputChange(e.target.value, 'unit')}
+                        />
+                    )}
+
+                    {/* Unit, Offset, Gain - chỉ hiển thị cho Modbus với function code phù hợp */}
+                    {currentProtocol === 'Modbus' && (Number(dataChannels.functionCode) > 2 && Number(dataChannels.functionCode) !== 5) && (
                         <>
                             {/* Unit */}
                             <TextField
@@ -413,26 +525,6 @@ const ModalChannel = (props) => {
                                 error={!!errors.gain}
                                 helperText={errors.gain}
                             />
-
-                            {/* Low Set */}
-                            <TextField
-                                label="Low Set"
-                                value={dataChannels.lowSet}
-                                variant="standard"
-                                onChange={(e) => handleInputChange(e.target.value, 'lowSet')}
-                                error={!!errors.lowSet}
-                                helperText={errors.lowSet}
-                            />
-
-                            {/* High Set */}
-                            <TextField
-                                label="High Set"
-                                value={dataChannels.highSet}
-                                variant="standard"
-                                onChange={(e) => handleInputChange(e.target.value, 'highSet')}
-                                error={!!errors.highSet}
-                                helperText={errors.highSet}
-                            />
                         </>
                     )}
 
@@ -445,19 +537,16 @@ const ModalChannel = (props) => {
                             variant="standard"
                             onChange={(e) => handleInputChange(e.target.value, 'functionText')}
                             multiline
-                            minRows={5} // số dòng tối thiểu hiển thị
-                            maxRows={5} // số dòng tối đa trước khi hiện thanh cuộn
-                            // fullWidth
+                            minRows={5}
+                            maxRows={5}
                             sx={{
                                 gridColumn: 'span 2',
                                 '& .MuiInputBase-root': {
                                     maxHeight: 250,
                                     overflowY: 'auto',
-                                    // fontFamily: 'monospace',
                                     whiteSpace: 'pre',
                                 }
                             }}
-
                         />
                     )}
 
@@ -476,23 +565,40 @@ const ModalChannel = (props) => {
                         </RadioGroup>
                     </Box>
 
-                    {/* Switch chọn FTP */}
-                    <FormControlLabel
-                        label="Select FTP"
-                        sx={{
-                            mb: 2,
-                            gap: 1, // khoảng cách giữa label và switch (theme.spacing(2) = 16px)
-                            "& .MuiFormControlLabel-label": {
-                                marginLeft: "12px", // cách trái 12px
-                            },
-                        }}
-                        control={
+                    <Box display="flex" flexDirection="row" gap={4} sx={{ ml: 2, mt: 0.7 }}>
+                        {/* FTP */}
+                        <Box display="flex" flexDirection="column" alignItems="center">
+                            <Typography variant="body2" sx={{ mb: 0.5 }}>
+                                FTP
+                            </Typography>
                             <Android12Switch
                                 checked={dataChannels.selectFTP}
                                 onChange={(e) => handleInputChange(e.target.checked, "selectFTP")}
                             />
-                        }
-                    />
+                        </Box>
+
+                        {/* MySQL */}
+                        <Box display="flex" flexDirection="column" alignItems="center">
+                            <Typography variant="body2" sx={{ mb: 0.5 }}>
+                                MySQL
+                            </Typography>
+                            <Android12Switch
+                                checked={dataChannels.selectMySQL}
+                                onChange={(e) => handleInputChange(e.target.checked, "selectMySQL")}
+                            />
+                        </Box>
+
+                        {/* SQL */}
+                        <Box display="flex" flexDirection="column" alignItems="center">
+                            <Typography variant="body2" sx={{ mb: 0.5 }}>
+                                SQL
+                            </Typography>
+                            <Android12Switch
+                                checked={dataChannels.selectSQL}
+                                onChange={(e) => handleInputChange(e.target.checked, "selectSQL")}
+                            />
+                        </Box>
+                    </Box>
 
                     {/* Footer */}
                     <Box mt={3}
@@ -501,18 +607,17 @@ const ModalChannel = (props) => {
                             variant="contained"
                             color="error"
                             startIcon={<CancelPresentation />}
-                            sx={{ textTransform: 'none' }}
+                            sx={{ mb: 2, textTransform: 'none' }}
                             onClick={handleClose}
                         >
                             Thoát
-
                         </Button>
                         <Button
                             type="submit"
                             variant="contained"
                             color="success"
                             startIcon={action === 'CREATE' ? <AddBoxIcon /> : <SaveIcon />}
-                            sx={{ ml: 1.5, textTransform: 'none' }}
+                            sx={{ ml: 1.5, mb: 2, textTransform: 'none' }}
                         >
                             {action === 'CREATE' ? 'Thêm' : 'Cập nhật'}
                         </Button>

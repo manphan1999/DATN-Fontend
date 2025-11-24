@@ -4,8 +4,9 @@ import {
 } from '../../../ImportComponents/Imports';
 
 const ModalDelete = (props) => {
-    const { action, isShowModalDelete, handleCloseModalDelete, conformDeleteDevice,
-        conformDeleteChannel, conformDeleteHistorical, conformDeleteAlarm, selectedCount } = props
+    const { action, isShowModalDelete, handleCloseModalDelete, conformDeleteDevice, conformDeleteChannel,
+        conformDeleteHistorical, conformDeleteAlarm, conformDeleteFTPServer, confirmDeleteMySQL, confirmDeleteSQL,
+        selectedCount } = props
     const handleDelete = () => {
         switch (action) {
             case 'CHANNEL':
@@ -16,6 +17,12 @@ const ModalDelete = (props) => {
                 return conformDeleteHistorical();
             case 'ALARM':
                 return conformDeleteAlarm();
+            case 'FTPSERVER':
+                return conformDeleteFTPServer();
+            case 'MYSQL':
+                return confirmDeleteMySQL();
+            case 'SQL':
+                return confirmDeleteSQL();
             default:
                 return null;
         }

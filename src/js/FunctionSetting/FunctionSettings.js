@@ -1,6 +1,5 @@
 import {
-    useState, useEffect, Chip,
-    IconButton, Box, Button, Paper, LinearProgress,
+    useState, useEffect, Chip, Box, Button, Paper, LinearProgress,
     AddCardIcon, BorderColorIcon, DeleteForeverIcon, toast,
     CheckCircleIcon, ErrorIcon, WarningAmberIcon, SensorsOffIcon, HelpOutlineIcon,
     socket, CustomDataGrid, ModalChannel, ModalDelete, Loading, InputPopover
@@ -20,7 +19,7 @@ const FunctionSettings = (props) => {
     const [listDataSocket, setListDataSocket] = useState([]);
     const [listDataFormat, setlistDataFormat] = useState([]);
     const [listDataType, setlistDataType] = useState([]);
-    const [listFunctionCode, setlistFunctionCode] = useState([]);
+    const [listFunctionCode, setlistFunctionCode] = useState({ modbus: [], mqtt: [] });
     const [listDevices, setListDevices] = useState([]);
     const [actionFuncSetting, setactionactionFuncSetting] = useState("FUNC");
     const [actionModalChannel, setactionModalChannel] = useState("CREATE");
@@ -93,22 +92,40 @@ const FunctionSettings = (props) => {
             const functionCodes = await fetchFunctionCode();
             const dataFormats = await fetchDataFormat();
             const dataTypes = await fetchDataType();
-            await fetchDevices();
-            await fetchChannel(functionCodes, dataFormats, dataTypes);
+            const devices = await fetchDevices();
+            await fetchChannel(functionCodes, dataFormats, dataTypes, devices);
             setLoading(false);
         };
         init();
     }, [isShowModalChannel]);
 
-    const fetchChannel = async (functionCodes = [], dataFormats = [], dataTypes = []) => {
+    const fetchChannel = async (functionCodes = { modbus: [], mqtt: [] }, dataFormats = [], dataTypes = [], devices = []) => {
         setLoading(true);
         let response = await fetchAllChannels();
 
         if (response && response.EC === 0 && Array.isArray(response.DT?.DT)) {
             const rowsWithId = response.DT.DT.map((item) => {
-                const func = functionCodes.find((f) => f.id === item.functionCode);
-                const format = dataFormats.find((f) => f.id === item.dataFormat);
-                const type = dataTypes.find((t) => t.id === item.dataType);
+                // Sử dụng tham số devices thay vì listDevices từ state
+                const deviceInfo = devices.find(device => device.id === item.device?._id);
+                const deviceProtocol = deviceInfo ? deviceInfo.protocol : null; // Hoặc driverName tùy theo dữ liệu
+
+                let func;
+                if (deviceProtocol === "MQTT") {
+                    func = functionCodes.mqtt.find(f =>
+                        f.id == item.functionCode ||
+                        Number(f.id) === Number(item.functionCode) ||
+                        String(f.id) === String(item.functionCode)
+                    );
+                } else {
+                    func = functionCodes.modbus.find(f =>
+                        f.id == item.functionCode ||
+                        Number(f.id) === Number(item.functionCode) ||
+                        String(f.id) === String(item.functionCode)
+                    );
+                }
+
+                const format = dataFormats.find(f => Number(f.id) === Number(item.dataFormat));
+                const type = dataTypes.find(t => Number(t.id) === Number(item.dataType));
 
                 return {
                     id: item._id,
@@ -116,41 +133,46 @@ const FunctionSettings = (props) => {
                     name: item.name,
                     deviceId: item.device?._id,
                     deviceName: item.device?.name,
+                    deviceProtocol: deviceProtocol,
                     symbol: item.symbol,
                     unit: item.unit,
                     offset: item.offset,
                     gain: item.gain,
-                    lowSet: item.lowSet,
-                    highSet: item.highSet,
                     slaveId: item.slaveId,
                     address: item.address,
+                    topic: item.topic,
                     functionCodeId: func ? func.id : item.functionCode,
-                    functionCodeName: func ? func.name : "",
+                    functionCodeName: func ? func.name : `Unknown (${item.functionCode})`,
                     dataFormatId: format ? format.id : item.dataFormat,
-                    dataFormatName: format ? format.name : "",
+                    dataFormatName: format ? format.name : '',
                     dataTypeId: type ? type.id : item.dataType,
-                    dataTypeName: type ? type.name : "",
+                    dataTypeName: type ? type.name : '',
                     functionText: item.functionText,
                     permission: item.permission,
                     selectFTP: item.selectFTP,
+                    selectMySQL: item.selectMySQL,
+                    selectSQL: item.selectSQL
                 };
             });
+
             setListChannel(rowsWithId);
         }
         setSelectionChannel([]);
         setSelectedCount(0);
         setLoading(false);
     };
-
     const fetchDevices = async () => {
         let response = await fetchAllDevices();
         if (response && response.EC === 0 && response.DT?.DT) {
             const listDevices = response.DT.DT.map((item, index) => ({
                 id: item._id,
                 name: item.name,
+                protocol: item.protocol, // hoặc driverName tùy theo dữ liệu
             }));
-            setListDevices(listDevices);
+            setListDevices(listDevices); // Vẫn set state để sử dụng ở nơi khác
+            return listDevices; // Trả về danh sách devices
         }
+        return []; // Trả về mảng rỗng nếu có lỗi
     };
 
     const fetchDataFormat = async () => {
@@ -182,15 +204,28 @@ const FunctionSettings = (props) => {
 
     const fetchFunctionCode = async () => {
         let response = await fetchAllFunctionCode();
-        if (response && response.EC === 0 && Array.isArray(response.DT?.DT)) {
-            const listFunctions = response.DT.DT.map((item) => ({
+        if (response && response.EC === 0 && response.DT) {
+            const listFuncModbus = response.DT.Modbus?.map(item => ({
                 id: item._id,
                 name: item.name,
-            }));
-            setlistFunctionCode(listFunctions);
-            return listFunctions;
+            })) || [];
+
+            const listFuncMQTT = response.DT.MQTT?.map(item => ({
+                id: item._id,
+                name: item.name,
+            })) || [];
+
+            setlistFunctionCode({
+                modbus: listFuncModbus,
+                mqtt: listFuncMQTT
+            });
+
+            return {
+                modbus: listFuncModbus,
+                mqtt: listFuncMQTT
+            };
         }
-        return [];
+        return { modbus: [], mqtt: [] };
     };
 
     const handleCloseModalChannel = () => {
@@ -283,27 +318,35 @@ const FunctionSettings = (props) => {
         {
             field: "acction",
             headerName: "Action",
-            flex: 1,
+            width: 190,
             headerAlign: 'center',
             align: 'center',
             sortable: false,
             filterable: false,
             renderCell: (params) => (
                 <>
-                    <IconButton
-                        color="primary"
-                        title="Chỉnh sửa"
-                        onClick={(e) => { e.stopPropagation(); handleEditChannel(params.row); }}
-                    >
-                        <BorderColorIcon />
-                    </IconButton>
-                    <IconButton
-                        color="error"
-                        title="Xóa"
-                        onClick={(e) => { e.stopPropagation(); handleDeleteDevice(params.row); }}
-                    >
-                        <DeleteForeverIcon />
-                    </IconButton>
+                    <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 1, height: '100%', }}  >
+                        <Button
+                            variant="contained"
+                            color="primary"
+                            startIcon={<BorderColorIcon />}
+                            sx={{ textTransform: 'none', minWidth: 80 }}
+                            onClick={(e) => { e.stopPropagation(); handleEditChannel(params.row); }}
+                        >
+                            Sửa
+                        </Button>
+
+                        <Button
+                            variant="contained"
+                            color="error"
+                            startIcon={<DeleteForeverIcon />}
+                            sx={{ textTransform: 'none', minWidth: 80 }}
+                            onClick={(e) => { e.stopPropagation(); handleDeleteDevice(params.row); }}
+                        >
+                            Xóa
+                        </Button>
+                    </Box>
+
                 </>
             ),
         },
@@ -475,7 +518,8 @@ const FunctionSettings = (props) => {
                 listDevices={listDevices}
                 listDataFormat={listDataFormat}
                 listDataType={listDataType}
-                listFunctionCode={listFunctionCode}
+                listFunctionCodeModbus={listFunctionCode.modbus}
+                listFunctionCodeMQTT={listFunctionCode.mqtt}
             />
 
             <ModalDelete

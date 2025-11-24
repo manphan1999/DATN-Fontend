@@ -2,7 +2,7 @@ import {
     useState, useEffect, Button, IconButton, MenuItem, TextField,
     Box, FindInPageIcon, InputAdornment, Modal, Typography, CancelIcon,
     CancelPresentation, AddBoxIcon, toast, _, Checkbox, useValidator,
-    socket, SaveIcon
+    socket, SaveIcon, InfoOutlinedIcon, WarningAmberIcon, ErrorIcon
 } from '../../../ImportComponents/Imports';
 import { createNewAlarm, updateTagAlarm } from '../../../../Services/APIDevice';
 
@@ -17,6 +17,8 @@ const ModalAddTagAlarm = (props) => {
         borderRadius: 2,
         boxShadow: 24,
         p: 2.5,
+        maxHeight: '90vh',
+        overflowY: 'auto',
     };
 
     const defaultDataChoose = {
@@ -26,6 +28,8 @@ const ModalAddTagAlarm = (props) => {
         deviceName: '',
         condition: '',
         rangeAlarm: '',
+        title: '',
+        type: '',
         content: '',
         selection: {},
     };
@@ -34,7 +38,7 @@ const ModalAddTagAlarm = (props) => {
     const [errors, setErrors] = useState({});
     const [dataAlarm, setDataAlarm] = useState(defaultDataChoose);
     const { action, openModalAddAlarm, handleCloseModalAddAlarm,
-        setopenModalSearchTag, setactionAlarm, dataModalAlarm } = props;
+        setopenModalSearchTag, setActionChooseTag, dataModalAlarm } = props;
 
     useEffect(() => {
         if (dataModalAlarm) {
@@ -107,7 +111,7 @@ const ModalAddTagAlarm = (props) => {
     };
 
     const handleOpenModalSearch = () => {
-        setactionAlarm('ALARM');
+        setActionChooseTag('ALARM');
         setopenModalSearchTag(true);
     }
 
@@ -196,10 +200,9 @@ const ModalAddTagAlarm = (props) => {
                     {/* Device */}
                     <TextField
                         label="Thiết bị"
-                        disabled
                         variant="standard"
                         value={dataAlarm.deviceName}
-                        onChange={(e) => handleOnchangeInput(e.target.value, 'deviceName')}
+                    //onChange={(e) => handleOnchangeInput(e.target.value, 'deviceName')}
                     />
 
                     {/* Trigger Conditions */}
@@ -229,6 +232,42 @@ const ModalAddTagAlarm = (props) => {
                         helperText={errors.rangeAlarm}
                     />
 
+                    <TextField
+                        select
+                        label="Type Alarm"
+                        value={dataAlarm.type}
+                        variant="standard"
+                        onChange={(event) => handleOnchangeInput(event.target.value, 'type')}
+                        error={!!errors.type}
+                        helperText={errors.type}
+                    >
+                        <MenuItem value="Info">
+                            <InfoOutlinedIcon color="primary" sx={{ mr: 1 }} />
+                            Info
+                        </MenuItem>
+
+                        <MenuItem value="Warning">
+                            <WarningAmberIcon color="warning" sx={{ mr: 1 }} />
+                            Warning
+                        </MenuItem>
+
+                        <MenuItem value="Error">
+                            <ErrorIcon color="error" sx={{ mr: 1 }} />
+                            Error
+                        </MenuItem>
+                    </TextField>
+
+                    {/* Title Alarm */}
+                    <TextField
+                        label="Title Alarm"
+                        value={dataAlarm.title}
+                        variant="standard"
+                        onChange={(event) => handleOnchangeInput(event.target.value, 'title')}
+                        error={!!errors.title}
+                        helperText={errors.title}
+                    >
+
+                    </TextField>
                     {/* Alarm Content */}
                     <TextField
                         label="Nội dung cảnh báo"

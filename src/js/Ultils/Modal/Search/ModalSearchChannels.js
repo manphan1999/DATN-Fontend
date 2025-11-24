@@ -1,14 +1,14 @@
 import {
     useState, useEffect, Paper, Button, IconButton, Modal, Box,
     Typography, InputAdornment, TextField, AddBoxIcon, SearchIcon,
-    CancelIcon, CancelPresentation, MenuItem, toast,
+    CancelIcon, CancelPresentation, MenuItem, toast, Checkbox,
     Loading, useValidator, socket, CustomDataGrid
 } from '../../../ImportComponents/Imports';
-import { fetchAllChannels, createNewHistorical } from '../../../../Services/APIDevice';
+import { fetchAllChannels, createNewHistorical, createTableMySQL, createTableSQL } from '../../../../Services/APIDevice';
 
 const ModalSearchChannels = (props) => {
-    const { actionHistorical, openModalAdd, handleCloseModalAdd, dataConfig,
-        openModalSearchTag, actionAlarm, setDataModalAlarm } = props;
+    const { actionHistorical, openModalAdd, handleCloseModalAdd, dataConfig, actionDatabase,
+        openModalSearchTag, actionChooseTag, setDataModalAlarm, dataDatabase } = props;
     const [paginationModel, setPaginationModel] = useState({ page: 0, pageSize: 5, });
     const style = {
         position: 'absolute',
@@ -25,13 +25,14 @@ const ModalSearchChannels = (props) => {
     };
 
     const defaultData = {
-        type: ""
+        type: "",
+        group: ""
     };
 
     const [errors, setErrors] = useState({});
     const { validate } = useValidator();
     const [dataEditTag, setDataEditTag] = useState(defaultData);
-
+    const [selectedServers, setSelectedServers] = useState([]);
     const [listChannelSearch, setlistChannelSearch] = useState([]);
     const [filteredList, setFilteredList] = useState([]);
     const [searched, setSearched] = useState("");
@@ -50,7 +51,7 @@ const ModalSearchChannels = (props) => {
         setLoading(true);
         let response = await fetchAllChannels();
         if (response && response.EC === 0 && Array.isArray(response.DT?.DT)) {
-            const rowsWithId = response.DT.DT.map((item) => ({
+            let rowsWithId = response.DT.DT.map((item) => ({
                 id: item._id,
                 channel: item.channel,
                 name: item.name,
@@ -58,11 +59,19 @@ const ModalSearchChannels = (props) => {
                 deviceName: item.device?.name,
                 symbol: item.symbol,
                 unit: item.unit,
+                dataFormat: item.dataFormat,
+                selectMySQL: item.selectMySQL,
+                selectSQL: item.selectSQL
             }));
+            if (actionDatabase === 'DATABASE MYSQL') {
+                rowsWithId = rowsWithId.filter(item => item.selectMySQL === true);
+            }
+            if (actionDatabase === 'DATABASE SQL') {
+                rowsWithId = rowsWithId.filter(item => item.selectSQL === true);
+            }
             setlistChannelSearch(rowsWithId);
             setFilteredList(rowsWithId);
-        }
-        setLoading(false);
+        } setLoading(false);
     };
 
     const handleOnchangeInput = (value, name) => {
@@ -71,14 +80,28 @@ const ModalSearchChannels = (props) => {
         setErrors((prev) => ({ ...prev, [name]: errorMessage, }));
     };
 
+    // hàm toggle checkbox server
+    const handleServerCheckboxChange = (serverName) => {
+        setSelectedServers(prev =>
+            prev.includes(serverName)
+                ? prev.filter(item => item !== serverName)
+                : [...prev, serverName]
+        );
+    };
+
     const validateAll = () => {
         const newErrors = {};
-        Object.entries(dataEditTag).forEach(([key, value]) => {
-            newErrors[key] = validate(key, value);
 
-        });
+        if (actionHistorical === 'HISTORICAL') {
+            newErrors.type = validate('type', dataEditTag.type);
+            newErrors.group = "";
+        } else if (actionDatabase === 'DATABASE MYSQL') {
+            newErrors.type = "";
+            newErrors.group = selectedServers.length === 0 ? "Vui lòng chọn ít nhất 1 server" : "";
+        }
+
         setErrors(newErrors);
-        // Kiểm tra xem có lỗi nào không
+
         return Object.values(newErrors).every((err) => err === "");
     };
 
@@ -86,6 +109,7 @@ const ModalSearchChannels = (props) => {
         handleCloseModalAdd();
         setErrors({});
         setSelectedRows([]);
+        setSelectedServers([]);
         setDataEditTag(defaultData);
     };
 
@@ -102,7 +126,6 @@ const ModalSearchChannels = (props) => {
         if (!validateAll()) {
             return;
         }
-        //console.log('check row add historical: ', row.id)
         const selectedData = filteredList
             .filter((row) => selectedRows.includes(row.id))
             .map((row) => ({
@@ -110,11 +133,55 @@ const ModalSearchChannels = (props) => {
                 name: row.name,
                 type: dataEditTag.type,
                 device: { _id: row.deviceId },
+                dataFormat: row.dataFormat,
+                selectMySQL: row.selectMySQL,
+                selectSQL: row.selectSQL
             }));
 
-        const res = actionHistorical === 'HISTORICAL'
-            ? await createNewHistorical(selectedData)
-            : []
+        if (actionDatabase === 'DATABASE MYSQL') {
+            const res = await createTableMySQL(dataDatabase, selectedData);
+
+            if (res && res.EC === 0) {
+                socket.emit('CREATE TABLE MYSQL');
+                toast.success(res.EM);
+                handleClose();
+            } else if (res && res.EC === 1) {
+                // Nếu có tag đã tồn tại
+                const messages = res.DT.map(
+                    item => `Server ${item.server}: ${item.existedTags.join(', ')}`
+                ).join(' | ');
+
+                toast.error(`${res.EM}: ${messages}`);
+            } else {
+                toast.error(res.EM);
+            }
+
+            return;
+        }
+
+        if (actionDatabase === 'DATABASE SQL') {
+            const res = await createTableSQL(dataDatabase, selectedData);
+
+            if (res && res.EC === 0) {
+                socket.emit('CREATE TABLE SQL');
+                toast.success(res.EM);
+                handleClose();
+            } else if (res && res.EC === 1) {
+                // Nếu có tag đã tồn tại
+                const messages = res.DT.map(
+                    item => `Server ${item.server}: ${item.existedTags.join(', ')}`
+                ).join(' | ');
+
+                toast.error(`${res.EM}: ${messages}`);
+            } else {
+                toast.error(res.EM);
+            }
+
+            return;
+        }
+
+        const res = await createNewHistorical(selectedData)
+
         if (res && res.EC === 0) {
             toast.success(res.EM);
             socket.emit("CHANGE HISTORICAL");
@@ -122,6 +189,7 @@ const ModalSearchChannels = (props) => {
         } else {
             toast.error(res.EM);
         }
+
     };
 
     const handleChooseTagAlarm = (rowData) => {
@@ -135,7 +203,7 @@ const ModalSearchChannels = (props) => {
         { field: 'deviceName', headerName: 'Device', flex: 1, align: 'center', headerAlign: 'center' },
         { field: 'symbol', headerName: 'Symbol', flex: 1, align: 'center', headerAlign: 'center' },
         { field: 'unit', headerName: 'Unit', flex: 1, align: 'center', headerAlign: 'center' },
-        ...(actionAlarm === 'ALARM' ? [
+        ...(actionChooseTag === 'ALARM' ? [
             {
                 field: "action",
                 headerName: "Action",
@@ -205,7 +273,7 @@ const ModalSearchChannels = (props) => {
                         onPaginationModelChange={setPaginationModel}
                         pageSizeOptions={[5, 10, 20]}
                         pagination
-                        {...(actionHistorical === 'HISTORICAL' && { checkboxSelection: true })}
+                        {...((actionHistorical === 'HISTORICAL' || actionDatabase === 'DATABASE MYSQL' || actionDatabase === 'DATABASE SQL') && { checkboxSelection: true })}
                         onRowSelectionModelChange={(newSelectionModel) => { setSelectedRows(newSelectionModel); }}
                         loading={loading}
                     />
@@ -238,6 +306,34 @@ const ModalSearchChannels = (props) => {
                         </Box>
                     </Paper>
                 )}
+
+                {(actionDatabase === 'DATABASE MYSQL' || actionDatabase === 'DATABASE SQL') && (
+                    <Paper sx={{ mt: 2, width: "100%", p: 2, borderRadius: 2, boxShadow: 2 }}>
+                        <Box sx={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 3, flexWrap: "wrap" }}>
+                            <Typography sx={{ fontSize: 16, fontWeight: 500 }}>
+                                Chọn Server:
+                            </Typography>
+
+                            {dataDatabase.map((server) => (
+                                <Box key={server.id} sx={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
+                                    <Typography sx={{ fontSize: 13, fontWeight: 600, mb: 0.5 }}>
+                                        {server.name}
+                                    </Typography>
+                                    <Checkbox
+                                        checked={selectedServers.includes(server.name)}
+                                        onChange={() => handleServerCheckboxChange(server.name)}
+                                    />
+                                </Box>
+                            ))}
+                        </Box>
+                        {errors.group && (
+                            <Typography sx={{ color: "red", mt: 1, fontSize: 12, textAlign: "center" }}>
+                                {errors.group}
+                            </Typography>
+                        )}
+                    </Paper>
+                )}
+
                 <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 2.5 }}>
 
                     <Button
@@ -250,7 +346,7 @@ const ModalSearchChannels = (props) => {
                         Thoát
 
                     </Button>
-                    {actionHistorical === 'HISTORICAL' && (
+                    {(actionHistorical === 'HISTORICAL' || actionDatabase === 'DATABASE MYSQL' || actionDatabase === 'DATABASE SQL') && (
                         <Button
                             variant="contained"
                             color="success"
@@ -259,7 +355,7 @@ const ModalSearchChannels = (props) => {
                             onClick={handleAddTagHistorical}
                             disabled={selectedRows.length === 0}
                         >
-                            Thêm
+                            {actionHistorical === 'HISTORICAL' ? 'Thêm' : 'Tạo Bảng'}
                         </Button>
                     )}
                 </Box>

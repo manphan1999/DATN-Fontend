@@ -15,6 +15,8 @@ const ModalAddHistorical = (props) => {
         borderRadius: 2,
         boxShadow: 24,
         p: 4,
+        maxHeight: '90vh',
+        overflowY: 'auto',
     };
     const defaultData = {
         name: '',

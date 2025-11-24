@@ -1,5 +1,5 @@
 import {
-    useState, useEffect, useMemo, Paper, Button, IconButton,
+    useState, useEffect, useMemo, Paper, Button, Box,
     AddCardIcon, DeleteForeverIcon, SettingsApplicationsIcon, toast,
     Loading, CustomDataGrid, socket, ModalDelete, ModalConfigHistorical,
     ModalEditConfig, ModalSearchChannels, ModalTagHistorical
@@ -177,21 +177,18 @@ const ListHistorical = () => {
             headerAlign: 'center', align: 'center',
             renderCell: (params) => (
                 <>
-                    {/* <IconButton
-                        sx={{ mr: 2 }}
-                        color="primary"
-                        title="Chỉnh sửa"
-                        onClick={(e) => { e.stopPropagation(); handleShowModalEditTag(params.row); }}
-                    >
-                        <BorderColorIcon />
-                    </IconButton> */}
-                    <IconButton
-                        color="error"
-                        title="Xóa"
-                        onClick={(e) => { e.stopPropagation(); handleDeleteHistorical(params.row); }}
-                    >
-                        <DeleteForeverIcon />
-                    </IconButton>
+                    <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 1, height: '100%', }}  >
+                        <Button
+                            variant="contained"
+                            color="error"
+                            startIcon={<DeleteForeverIcon />}
+                            sx={{ textTransform: 'none', minWidth: 80 }}
+                            onClick={(e) => { e.stopPropagation(); handleDeleteHistorical(params.row); }}
+                        >
+                            Xóa
+                        </Button>
+                    </Box>
+
                 </>
             ),
         }
@@ -219,7 +216,7 @@ const ListHistorical = () => {
                 Cấu hình
             </Button>
 
-            {selectedCount > 0 && (
+            {selectedCount > 1 && (
                 <Button
                     variant="contained"
                     color="error"
@@ -227,7 +224,7 @@ const ListHistorical = () => {
                     onClick={(e) => { e.stopPropagation(); handleDeleteHistorical(); }}
                     sx={{ mb: 1.5, mx: 1.5, textTransform: 'none' }}
                 >
-                    Xóa Tag
+                    Xóa Tags
                 </Button>
             )}
 

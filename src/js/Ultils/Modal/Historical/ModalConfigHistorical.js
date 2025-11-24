@@ -18,7 +18,7 @@ const ModalConfigHistorical = (props) => {
         borderRadius: 2,
         boxShadow: 24,
         p: 3,
-        maxHeight: '90vh', // chiều cao tối đa theo viewport
+        maxHeight: '90vh',
         overflowY: 'auto',
     };
 

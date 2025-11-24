@@ -127,6 +127,84 @@ const findAlarmTime = (dateTime) => {
     return axios.post(`/api/v1/alarm/get-listdata-time`, dateTime)
 }
 
+/* API FTP */
+const fetchAllFTPServer = () => {
+    return axios.get(`/api/v1/ftp/get-ftpserver`)
+}
+
+const createFTPServer = (tagNew) => {
+    return axios.post(`/api/v1/ftp/create-ftpserver`, tagNew)
+}
+
+const updateFTPServer = (FTPServer) => {
+    return axios.put(`/api/v1/ftp/update-ftpserver`, FTPServer)
+}
+
+const deleteFTPServer = (dataDelete) => {
+    return axios.delete(`/api/v1/ftp/delete-ftpserver`, {
+        data: dataDelete
+    });
+};
+
+/* API MYSQL */
+const testMySQLServer = (mySQLServer) => {
+    return axios.post(`/api/v1/mysql/testconnect-mysqlserver`, mySQLServer)
+}
+
+const createTableMySQL = (mySQLServer, tags) => {
+    return axios.post(`/api/v1/mysql/createtable-mysqlserver`, {
+        mySQLServer,
+        tags,
+    })
+}
+
+const fetchAllMySQLServer = () => {
+    return axios.get(`/api/v1/mysql/get-mysqlserver`)
+}
+
+const createMySQLServer = (mySQLServer) => {
+    return axios.post(`/api/v1/mysql/create-mysqlserver`, mySQLServer)
+}
+
+const updateMySQLServer = (mySQLServer) => {
+    return axios.put(`/api/v1/mysql/update-mysqlserver`, mySQLServer)
+}
+
+const deleteMySQLServer = (dataDelete) => {
+    return axios.delete(`/api/v1/mysql/delete-mysqlserver`, {
+        data: dataDelete
+    });
+};
+
+/* API SQL */
+const testSQLServer = (SQLServer) => {
+    return axios.post(`/api/v1/sql/testconnect-sqlserver`, SQLServer)
+}
+
+const createTableSQL = (SQLServer, tags) => {
+    return axios.post(`/api/v1/sql/createtable-sqlserver`, {
+        SQLServer,
+        tags,
+    })
+}
+
+const fetchAllSQLServer = () => {
+    return axios.get(`/api/v1/sql/get-sqlserver`)
+}
+
+const createSQLServer = (SQLServer) => {
+    return axios.post(`/api/v1/sql/create-sqlserver`, SQLServer)
+}
+
+const updateSQLServer = (SQLServer) => {
+    return axios.put(`/api/v1/sql/update-sqlserver`, SQLServer)
+}
+
+const deleteSQLServer = (dataDelete) => {
+    return axios.delete(`/api/v1/sql/delete-sqlserver`, {
+        data: dataDelete
+    });
+};
 export {
     fetchAllProtocol,
     fetchAllDevices, createNewDevice, deleteDevice, updateCurrentDevice,
@@ -134,5 +212,9 @@ export {
     fetchAllChannels, createNewChannel, updateCurrentChannel, deleteChannel, fetchAllDataFormat, fetchAllDataType, fetchAllFunctionCode,
     fetchAllHistorical, fetchConfigHistorical, createNewHistorical, updateConfigHistorical, deleteHistorical,
     fetchAllHistoricalValue, findHistoricalTime, fetchAllAlarmValue, findAlarmTime,
-    fetchAllTagAlarm, createNewAlarm, updateTagAlarm, deleteTagAlarm, fetchAllApp, createNewApp, updateApp
+    fetchAllTagAlarm, createNewAlarm, updateTagAlarm, deleteTagAlarm, fetchAllApp, createNewApp, updateApp,
+    fetchAllFTPServer, createFTPServer, updateFTPServer, deleteFTPServer,
+    fetchAllMySQLServer, createMySQLServer, updateMySQLServer, deleteMySQLServer,
+    testMySQLServer, createTableMySQL, testSQLServer, createTableSQL,
+    fetchAllSQLServer, createSQLServer, updateSQLServer, deleteSQLServer
 }

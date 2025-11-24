@@ -2,13 +2,13 @@ import {
     useState, useEffect, _, Typography, Checkbox, Paper, Button, BorderColorIcon,
     AddCardIcon, DeleteForeverIcon, Box, toast, SettingsApplicationsIcon, Loading,
     ModalSearchChannels, ModalDelete, CustomDataGrid, ModalAddTagAlarm, ModalConfigAlarm,
-    ModalEditApp, socket
+    ModalEditApp, socket, InfoOutlinedIcon, WarningAmberIcon, ErrorIcon
 } from '../../../ImportComponents/Imports';
 import { fetchAllTagAlarm, deleteTagAlarm } from "../../../../Services/APIDevice";
 
 const ListAlarm = () => {
     const [action, setAction] = useState();
-    const [actionAlarm, setactionAlarm] = useState();
+    const [actionChooseTag, setActionChooseTag] = useState();
     const [openModalAddAlarm, setopenModalAddAlarm] = useState(false);
     const [openModalSearchTag, setopenModalSearchTag] = useState(false);
     const [openModalAddApp, setopenModalAddApp] = useState(false);
@@ -43,6 +43,8 @@ const ListAlarm = () => {
                 deviceName: item.deviceName,
                 condition: item.condition,
                 content: item.content,
+                type: item.type,
+                title: item.title,
                 rangeAlarm: item.rangeAlarm,
                 selection: item.selection,
             }));
@@ -95,11 +97,12 @@ const ListAlarm = () => {
         }
         setDataModalDelete(dataToDelete);
         setIsShowModalDelete(true);
-        setactionAlarm('ALARM');
+        setActionChooseTag('ALARM');
     };
 
     const conformDeleteAlarm = async () => {
         // Gửi xuống cả id và tagnameId
+        console.log('check { list: dataModalDelete } ', { list: dataModalDelete })
         let res = await deleteTagAlarm({ list: dataModalDelete });
         let serverData = res;
         if (+serverData.EC === 0) {
@@ -117,6 +120,43 @@ const ListAlarm = () => {
         { field: 'deviceName', headerName: 'Device', flex: 1, width: 150, align: 'center', headerAlign: 'center' },
         { field: 'condition', headerName: 'Condition', flex: 1, width: 100, align: 'center', headerAlign: 'center' },
         { field: 'rangeAlarm', headerName: 'Range', flex: 1, width: 100, align: 'center', headerAlign: 'center' },
+        {
+            field: 'type',
+            headerName: 'Type',
+            flex: 1,
+            width: 100,
+            align: 'center',
+            headerAlign: 'center',
+            renderCell: (params) => {
+                const type = params.row.type;
+
+                const typeMap = {
+                    Info: { icon: <InfoOutlinedIcon color="primary" />, label: 'Info' },
+                    Warning: { icon: <WarningAmberIcon color="warning" />, label: 'Warning' },
+                    Error: { icon: <ErrorIcon color="error" />, label: 'Error' },
+                };
+
+                const current = typeMap[type] || { icon: null, label: '-' };
+
+                return (
+                    <Box
+                        sx={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            gap: 1,
+                            width: '100%',
+                            height: '100%',
+                        }}
+                    >
+                        {current.icon}
+                        <Typography sx={{ fontSize: 13, fontWeight: 600 }}>
+                            {current.label}
+                        </Typography>
+                    </Box>
+                );
+            },
+        },
         {
             field: 'selection',
             headerName: 'Notify',
@@ -144,8 +184,7 @@ const ListAlarm = () => {
                                 <Typography sx={{ fontSize: 13, fontWeight: 600 }}>{name}</Typography>
                                 <Checkbox
                                     color={color}
-                                    checked={!!selection[name]} // true → tích, false/undefined → trống
-                                // disabled
+                                    checked={!!selection[name]}
                                 />
                             </Box>
                         ))}
@@ -156,7 +195,7 @@ const ListAlarm = () => {
         {
             field: 'action',
             headerName: 'Action',
-            flex: 1,
+            width: 190,
             headerAlign: 'center', align: 'center',
             renderCell: (params) => (
                 <>
@@ -209,7 +248,7 @@ const ListAlarm = () => {
                 Cấu hình
             </Button>
 
-            {selectedCount > 0 && (
+            {selectedCount > 1 && (
                 <Button
                     variant="contained"
                     color="error"
@@ -217,7 +256,7 @@ const ListAlarm = () => {
                     onClick={(e) => { e.stopPropagation(); handleDeleteTagAlarm(); }}
                     sx={{ mb: 1.5, mx: 1.5, textTransform: 'none' }}
                 >
-                    Xóa Tag
+                    Xóa Tags
                 </Button>
             )}
 
@@ -244,7 +283,7 @@ const ListAlarm = () => {
             {/* Modal thêm mới */}
             <ModalAddTagAlarm
                 action={action}
-                setactionAlarm={setactionAlarm}
+                setActionChooseTag={setActionChooseTag}
                 openModalAddAlarm={openModalAddAlarm}
                 handleCloseModalAddAlarm={handleCloseModalAddAlarm}
                 setopenModalSearchTag={setopenModalSearchTag}
@@ -253,7 +292,7 @@ const ListAlarm = () => {
             />
 
             <ModalSearchChannels
-                actionAlarm={actionAlarm}
+                actionChooseTag={actionChooseTag}
                 openModalSearchTag={openModalSearchTag}
                 handleCloseModalAdd={handleCloseModalSearchTag}
                 setDataModalAlarm={setDataModalAlarm}
@@ -266,7 +305,7 @@ const ListAlarm = () => {
                 dataModalDelete={dataModalDelete}
                 conformDeleteAlarm={conformDeleteAlarm}
                 selectedCount={selectedCount}
-                action={actionAlarm}
+                action={actionChooseTag}
             />
 
             {/* Modal cấu hình app cảnh báo */}

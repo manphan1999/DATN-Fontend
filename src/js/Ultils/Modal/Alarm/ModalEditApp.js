@@ -16,6 +16,8 @@ const ModalEditApp = (props) => {
         borderRadius: 2,
         boxShadow: 24,
         p: 2.5,
+        maxHeight: '90vh',
+        overflowY: 'auto',
     };
 
     const defaultData = {
@@ -90,25 +92,6 @@ const ModalEditApp = (props) => {
             toast.error(res.EM);
         }
     };
-
-    // const handleConfirm = async () => {
-    //     console.log("dataApp dataApp:", dataApp);
-    //     if (!validateAll()) return;
-
-    //     const groups = dataApp.groupId
-    //         .split(',')
-    //         .map(g => g.trim())
-    //         .filter(g => g !== "");
-    //     const dataToSave = { ...dataApp, groupId: groups, };
-    //     const res = await updateApp(dataToSave);
-    //     if (res && res.EC === 0) {
-    //         toast.success(res.EM);
-    //         socket.emit("CHANGE APP");
-    //         handleClose();
-    //     } else {
-    //         toast.error(res.EM);
-    //     }
-    // };
 
     return (
         <Modal open={openModalEditApp} onClose={handleClose}>

@@ -153,7 +153,14 @@ const ModalProtocol = (props) => {
     return (
         <>
             {/* Modal chọn protocol */}
-            <Modal open={isShowModalProtocol} onClose={handleClose}>
+            <Modal open={isShowModalProtocol} onClose={handleClose}
+                onKeyDown={(e) => {
+                    if (e.key === "Enter") {
+                        e.preventDefault();
+                        handleConfirmProtocol();
+                    }
+                }}
+            >
                 <Box sx={style}>
                     <Typography variant="h6" align="center" sx={{ fontWeight: 600, }}  >
                         Chọn Protocol

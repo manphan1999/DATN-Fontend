@@ -1,7 +1,7 @@
 import {
-    useState, useEffect, Paper, dayjs, TextField, MenuItem,
-    Box, Button, IosShareIcon, Stack, FindInPageIcon,
-    useValidator, CustomDataGrid, Loading, CustomDateTimePicker, exportToCSV
+    useState, useEffect, Paper, dayjs, TextField, MenuItem, HelpOutlineIcon, WarningAmberIcon,
+    Box, Button, IosShareIcon, Stack, FindInPageIcon, ErrorIcon, InfoOutlinedIcon,
+    useValidator, CustomDataGrid, Loading, CustomDateTimePicker, exportToCSV, Chip
 } from '../../ImportComponents/Imports';
 import { fetchAllAlarmValue, fetchAllTagAlarm, findAlarmTime } from '../../../Services/APIDevice'
 
@@ -60,7 +60,9 @@ const ListAlarm = () => {
                             condition: alarmItem.condition,
                             rangeAlarm: alarmItem.rangeAlarm,
                             content: alarmItem.content,
-                            timestamp: dayjs(alarmGroup.ts).format("DD-MM-YYYY - HH:mm:ss"),
+                            title: alarmItem.title,
+                            type: alarmItem.type,
+                            timestamp: dayjs(alarmGroup.ts).format("DD/MM/YYYY - HH:mm:ss"),
                         });
                     });
                 });
@@ -94,7 +96,9 @@ const ListAlarm = () => {
                     condition: item.condition,
                     rangeAlarm: item.rangeAlarm,
                     content: item.content,
-                    timestamp: dayjs(item.ts).format("DD-MM-YYYY - HH:mm:ss"),
+                    title: item.title,
+                    type: item.type,
+                    timestamp: dayjs(item.ts).format("DD/MM/YYYY - HH:mm:ss"),
                 }));
                 const reversed = rows.reverse();
                 const rowsWithNewId = reversed.map((item, index) => ({
@@ -111,7 +115,7 @@ const ListAlarm = () => {
     const handleExportCSV = () => {
         // console.log('selectedTag: ', selectedTag)
         if (!validateAll()) return;
-        const headers = ['STT', 'Ngày và Giờ', 'Tên', 'Giá trị', 'Điều kiện', 'Ngưỡng', 'Nội dung'];
+        const headers = ['STT', 'Ngày và Giờ', 'Tên', 'Giá trị', 'Điều kiện', 'Ngưỡng', 'Tiêu đề', 'Nội dung', 'Loại'];
         const csvData = listAlarmValue.map(item => [
             item.id,
             item.timestamp,
@@ -119,7 +123,9 @@ const ListAlarm = () => {
             item.value,
             item.condition,
             item.rangeAlarm,
-            item.content
+            item.title,
+            item.content,
+            item.type,
         ]);
 
         // Lấy tên từ selectedTag
@@ -131,12 +137,60 @@ const ListAlarm = () => {
 
     const columns = [
         { field: 'id', headerName: 'STT', width: 100, align: 'center', headerAlign: 'center' },
-        { field: 'timestamp', headerName: 'Date and Time', width: 250, align: 'center', headerAlign: 'center' },
+        { field: 'timestamp', headerName: 'Date and Time', width: 160, align: 'center', headerAlign: 'center' },
         { field: 'tagname', headerName: 'Name', flex: 1, align: 'center', headerAlign: 'center' },
         { field: 'value', headerName: 'Value', flex: 1, align: 'center', headerAlign: 'center' },
         { field: 'condition', headerName: 'Condition', width: 100, align: 'center', headerAlign: 'center' },
         { field: 'rangeAlarm', headerName: 'Range', flex: 1, align: 'center', headerAlign: 'center' },
+        { field: 'title', headerName: 'Title', flex: 1, align: 'center', headerAlign: 'center' },
         { field: 'content', headerName: 'Content', flex: 1, align: 'center', headerAlign: 'center' },
+        {
+            field: "type",
+            headerName: "Type",
+            width: 250,
+            headerAlign: "center",
+            align: "center",
+            renderCell: (params) => {
+                const type = params.value || "Unknown";
+                let color = "default";
+                let icon = <HelpOutlineIcon sx={{ fontSize: 18 }} />;
+
+                switch (type) {
+                    case "Info":
+                        color = "primary";
+                        icon = <InfoOutlinedIcon sx={{ fontSize: 18 }} />;
+                        break;
+                    case "Warning":
+                        color = "warning";
+                        icon = <WarningAmberIcon sx={{ fontSize: 18 }} />;
+                        break;
+                    case "Error":
+                        color = "error";
+                        icon = <ErrorIcon sx={{ fontSize: 18 }} />;
+                        break;
+                    default:
+                        color = "default";
+                        icon = <HelpOutlineIcon sx={{ fontSize: 18 }} />;
+                }
+
+                return (
+                    <Chip
+                        icon={icon}
+                        label={type}
+                        color={color}
+                        variant="filled"
+                        sx={{
+                            fontWeight: 600,
+                            textTransform: "capitalize",
+                            minWidth: 120,
+                            justifyContent: "center",
+                            pl: 1,
+                            "& .MuiChip-icon": { ml: 0.3 },
+                        }}
+                    />
+                );
+            },
+        }
     ];
 
     return (
