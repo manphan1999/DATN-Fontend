@@ -1,0 +1,26 @@
+1. npm install
+2. npm install @mui/material@5 @mui/icons-material@5 @mui/x-data-grid@5 @emotion/react@11 @emotion/styled@11
+3. npm install --save-exact sass@1.48.0 react-router-dom@5.3.0 axios@0.25.0
+4. npm install --save-exact react-bootstrap@2.1.1
+5. npm install --save-exact bootstrap@5.1.3
+6. npm install --save-exact lodash@4.17.21
+7. npm install socket.io-client@4.7.2
+8. npm install material-ui-search-bar
+npm install --save-exact sass@1.48.0 react-router-dom@5.3.0 axios@0.25.0 react-bootstrap@2.1.1 bootstrap@5.1.3 lodash@4.17.21
+
+Link post git: https://github.com/manphan1999/DATN-Backend.git
+How to post project on github
+1. Use command: git init --> Use the first
+2. Use command: git add .
+3. Use command: git commit -m 'DATN-Fontend'
+4. Use command: git remote add origin https://github.com/manphan1999/DATN-Fontend.git
+5. Use command: git push -u origin master
+
+
+Update
+git add .
+git commit -m 'DATN-Fontend'
+git push
+
+
+
