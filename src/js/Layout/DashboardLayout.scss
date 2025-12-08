@@ -1,0 +1,143 @@
+// src/js/Layout/DashboardLayout.scss
+
+.dashboard-container {
+    display: flex;
+    min-height: 100vh;
+
+    .sidebar {
+        width: 240px;
+        border-right: 1px solid #e0e0e0;
+        background: #868383;
+
+        .logo {
+            padding: 20px;
+            border-bottom: 1px solid #e0e0e0;
+            font-size: 20px;
+            font-weight: bold;
+            color: #2196f3;
+        }
+
+        .menu-section {
+            padding: 16px 0;
+
+            .section-title {
+                padding: 8px 16px;
+                font-size: 12px;
+                font-weight: 600;
+                color: #757575;
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+            }
+
+            .menu-item {
+                display: flex;
+                align-items: center;
+                padding: 10px 16px;
+                margin: 0 8px;
+                border-radius: 4px;
+                cursor: pointer;
+                transition: all 0.2s;
+                color: #424242;
+
+                &:hover {
+                    background: rgba(33, 150, 243, 0.08);
+                }
+
+                &.active {
+                    background: rgba(33, 150, 243, 0.08);
+                    border-left: 3px solid #2196f3;
+                    color: #2196f3;
+                    font-weight: 600;
+                }
+
+                .menu-icon {
+                    margin-right: 12px;
+                    font-size: 20px;
+                }
+
+                .menu-text {
+                    flex: 1;
+                    font-size: 14px;
+                }
+
+                .expand-icon {
+                    font-size: 18px;
+                }
+            }
+
+            .submenu {
+                padding-left: 40px;
+
+                .submenu-item {
+                    padding: 8px 16px;
+                    margin: 4px 8px;
+                    border-radius: 4px;
+                    cursor: pointer;
+                    font-size: 13px;
+                    color: #616161;
+                    transition: all 0.2s;
+
+                    &:hover {
+                        background: rgba(33, 150, 243, 0.08);
+                    }
+
+                    &.active {
+                        background: rgba(33, 150, 243, 0.08);
+                        color: #2196f3;
+                        font-weight: 500;
+                    }
+                }
+            }
+        }
+    }
+
+    .main-content {
+        flex: 1;
+        background: #f5f5f5;
+
+        .app-bar {
+            background: #fff;
+            box-shadow: 0 1px 3px rgba(46, 4, 11, 0.12);
+            padding: 16px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+
+            .breadcrumb {
+                color: #2d578f;
+                font-size: 14px;
+            }
+
+            .actions {
+                display: flex;
+                gap: 8px;
+            }
+        }
+
+        .content-wrapper {
+            padding: 24px;
+        }
+    }
+}
+
+// Responsive
+@media (max-width: 768px) {
+    .dashboard-container {
+        .sidebar {
+            position: fixed;
+            left: -240px;
+            top: 0;
+            bottom: 0;
+            z-index: 1200;
+            transition: left 0.3s;
+
+            &.mobile-open {
+                left: 0;
+            }
+        }
+
+        .main-content {
+            width: 100%;
+        }
+    }
+}
