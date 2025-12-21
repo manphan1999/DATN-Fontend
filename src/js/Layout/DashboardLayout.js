@@ -3,7 +3,7 @@ import {
     AppBar, Box, Drawer, Toolbar, List, ListItemButton, ListItemText, ListItemIcon,
     Typography, IconButton, Divider, Avatar, Menu, MenuItem, Paper, ListItemIcon as MenuItemIcon,
     // Icons
-    MenuIcon, MenuOpenIcon, DashboardIcon, DevicesIcon, HistoryIcon, LabelIcon, StorageIcon,
+    MenuIcon, MenuOpenIcon, HomeWorkIcon, DevicesIcon, HistoryIcon, LabelIcon, StorageIcon,
     DisplaySettingsIcon, Brightness4Icon, Brightness7Icon, PersonOutlineIcon, LogoutIcon, toast,
     SettingsApplicationsIcon, PeopleOutlineIcon
 } from "../ImportComponents/Imports";
@@ -100,7 +100,7 @@ const DashboardLayout = () => {
     };
 
     const mainMenuItems = [
-        { id: "home", text: "Trang chủ", icon: <DashboardIcon />, path: "/home" },
+        { id: "home", text: "Trang chủ", icon: <HomeWorkIcon />, path: "/home" },
         { id: "device", text: "Thiết bị", icon: <DevicesIcon />, path: "/device" },
         { id: "tagname", text: "Tag Name", icon: <LabelIcon />, path: "/tagname" },
         { id: "configuration", text: "Cấu hình", icon: <DisplaySettingsIcon />, path: "/configuration" },

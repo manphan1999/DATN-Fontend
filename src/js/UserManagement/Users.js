@@ -1,5 +1,5 @@
 import {
-    useState, useEffect, Paper, Button, Box, ModalUser,
+    useState, useEffect, Paper, Button, Box, ModalUser, Fab, AddIcon,
     AddCardIcon, DeleteForeverIcon, Loading, CustomDataGrid, BorderColorIcon,
     ModalDelete, toast
 } from '../ImportComponents/Imports';
@@ -125,29 +125,19 @@ const ListUser = () => {
 
     return (
         <div>
-            <Button
-                variant="contained"
-                color="success"
-                startIcon={<AddCardIcon />}
-                onClick={handleOpenModalAdd}
-                sx={{ mt: 1.5, mb: 1.5, textTransform: 'none' }}
-            >
-                Thêm
-            </Button>
-
             {selectedCount > 1 && (
                 <Button
                     variant="contained"
                     color="error"
                     startIcon={<DeleteForeverIcon />}
                     onClick={(e) => { e.stopPropagation(); handleDeleteUser(); }}
-                    sx={{ mb: 1.5, mx: 1.5, textTransform: 'none' }}
+                    sx={{ mt: 2.5, ml: 2, textTransform: 'none' }}
                 >
                     Xóa nhiều
                 </Button>
             )}
 
-            <Paper sx={{ height: 400, width: '100%' }}>
+            <Paper sx={{ height: 400, m: 2 }}>
                 <CustomDataGrid
                     rows={listUser}
                     columns={columns}
@@ -166,6 +156,16 @@ const ListUser = () => {
 
                 {loading && <Loading text="Đang tải dữ liệu..." />}
             </Paper>
+
+            <Box
+                sx={{
+                    position: 'fixed', bottom: 24, right: 24, '& > :not(style)': { m: 1 }, zIndex: 1200,    // luôn nổi trên UI
+                }}
+            >
+                <Fab color="secondary" aria-label="edit" onClick={handleOpenModalAdd} >
+                    <AddIcon />
+                </Fab>
+            </Box>
 
             {/* Modal thêm mới */}
             <ModalUser

@@ -13,6 +13,13 @@ export {
 } from '@mui/material';
 
 // MUI Icons
+export { default as LockIcon } from '@mui/icons-material/Lock';
+export { default as SupervisorAccountIcon } from '@mui/icons-material/SupervisorAccount';
+export { default as SensorsOutlinedIcon } from '@mui/icons-material/SensorsOutlined';
+export { default as DashboardOutlinedIcon } from '@mui/icons-material/DashboardOutlined';
+export { default as CloudUploadOutlinedIcon } from '@mui/icons-material/CloudUploadOutlined';
+export { default as NotificationsActiveOutlinedIcon } from '@mui/icons-material/NotificationsActiveOutlined';
+export { default as FactoryOutlinedIcon } from '@mui/icons-material/FactoryOutlined';
 export { default as RestartAltIcon } from '@mui/icons-material/RestartAlt';
 export { default as PeopleOutlineIcon } from '@mui/icons-material/PeopleOutline';
 export { default as MenuIcon } from "@mui/icons-material/Menu";
@@ -73,6 +80,7 @@ export { default as StorageIcon } from '@mui/icons-material/Storage';
 export { default as DisplaySettingsIcon } from '@mui/icons-material/DisplaySettings';
 export { default as NotificationsNoneIcon } from '@mui/icons-material/NotificationsNone';
 export { default as ErrorOutlineIcon } from '@mui/icons-material/ErrorOutline';
+export { default as HomeWorkIcon } from '@mui/icons-material/HomeWork';
 // MUI Date Pickers
 export { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
 export { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
@@ -120,5 +128,6 @@ export { default as ModalDatabase } from '../Ultils/Modal/Database/ModalDatabase
 export { default as ModalAddTagServer } from '../Ultils/Modal/Server/ModalAddTagServer';
 export { default as ModalUser } from '../Ultils/Modal/User/ModalUser';
 export { default as ModalAddTagPublish } from '../Ultils/Modal/MQTT/ModalAddTagPublish';
+export { default as ModalSetting } from '../Ultils/Modal/Setting/ModalSetting';
 export { default as Loading } from "../Ultils/Loading/Loading";
 export { default as InputPopover } from "../Ultils/Popover/Popover";

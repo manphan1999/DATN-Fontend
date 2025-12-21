@@ -1,12 +1,14 @@
 import {
     useState, useEffect, Paper, Button, Box, Typography, SaveIcon,
-    MenuItem, RestartAltIcon, Loading, BorderColorIcon, CancelPresentation,
-    TextField, toast, _, useValidator
+    RestartAltIcon, Loading, BorderColorIcon, CancelPresentation,
+    TextField, toast, _, useValidator, ModalSetting,
 } from '../ImportComponents/Imports';
 
-import { fetchSetting, fetchHeader, updateHeader } from '../../Services/APIDevice';
+import { fetchSetting, fetchNetwork, rebootDevice, fetchHeader, updateHeader, updateNetwork } from '../../Services/APIDevice';
 
 const ListSetting = () => {
+    const [action, SetAction] = useState('');
+    const [isShowModalSetting, SetIsShowModalSetting] = useState(false);
     const [enableConfigNetwork, setEnableConfigNetwork] = useState(false);
     const [enableConfigHeader, setEnableConfigHeader] = useState(false);
     const [dataNetwork, setDataNetwork] = useState({});
@@ -23,11 +25,22 @@ const ListSetting = () => {
             localStorage.setItem("redirectAfterLogin", window.location.pathname);
             window.location.href = '/login';
         } else {
-            fetchSetting();
-            fetchContentHeader();
-            console.log(dataNetwork);
+            initData();
         }
     }, []);
+
+    const initData = async () => {
+        try {
+            setLoading(true);
+            await Promise.all([
+                fetchSetting(),
+                fetchContentHeader(false),
+                fetchAllNetwork(false)
+            ]);
+        } finally {
+            setLoading(false);
+        }
+    };
 
     const fetchContentHeader = async () => {
         setLoading(true);
@@ -40,9 +53,27 @@ const ListSetting = () => {
         setLoading(false);
     }
 
+    const fetchAllNetwork = async () => {
+        setLoading(true);
+        const res = await fetchNetwork();
+        if (res && res.EC === 0 && res.DT?.DT) {
+            const net = res.DT.DT;
+            const networkData = {
+                conn: net.CONN,
+                ipAddress: net.ip,
+                subnet: net.subnet,
+                gateway: net.gateway,
+                dns: net.dns
+            };
+            setDataNetwork(networkData);
+            setOriginalDataNetwork(networkData);
+        }
+        setLoading(false);
+    };
+
     const validateAllNetwork = () => {
         const newErrors = {};
-        let fieldsToValidate = ["ipAddress", "subnet", "gateway", "dns"];
+        let fieldsToValidate = ["ipAddress", "gateway", "subnet", "dns"];
 
         fieldsToValidate.forEach((key) => {
             const value = dataNetwork[key];
@@ -67,13 +98,16 @@ const ListSetting = () => {
         setDataHeader(prev => ({ ...prev, [name]: value }));
     };
 
-    const handleReboot = () => {
-
+    const handleReboot = async () => {
+        const res = await rebootDevice();
+        if (res && res.DT.EC === 0) { toast.success(res.EM); }
+        else { toast.error(res.EM); }
     }
 
     const handleConfigNetwork = () => {
         if (!enableConfigNetwork) {
             setEnableConfigNetwork(true);
+            setEnableConfigHeader(false);
         } else {
             setEnableConfigNetwork(false);
         }
@@ -82,6 +116,7 @@ const ListSetting = () => {
     const handleConfigHeader = () => {
         if (!enableConfigHeader) {
             setEnableConfigHeader(true);
+            setEnableConfigNetwork(false);
         } else {
             setEnableConfigHeader(false);
         }
@@ -89,7 +124,18 @@ const ListSetting = () => {
 
     const handleChangeNetwork = async () => {
         if (!validateAllNetwork()) return;
-
+        setLoading(true);
+        const res = await updateNetwork(dataNetwork);
+        if (res && res.DT.EC === 0) {
+            setLoading(false);
+            toast.success(res.EM);
+            handleCloseModalSetting();
+            setEnableConfigNetwork(false);
+            fetchAllNetwork();
+        }
+        else {
+            toast.error(res.EM);
+        }
     }
 
     const handleChangeHeader = async () => {
@@ -97,8 +143,17 @@ const ListSetting = () => {
         if (res && res.EC === 0) {
             toast.success(res.EM);
             setEnableConfigHeader(false);
+            handleCloseModalSetting();
             fetchContentHeader();
         }
+    }
+
+    const handleOpenModalSetting = (action) => {
+        SetIsShowModalSetting(true);
+    }
+
+    const handleCloseModalSetting = () => {
+        SetIsShowModalSetting(false);
     }
 
     return (
@@ -110,7 +165,7 @@ const ListSetting = () => {
                             Cấu hình IP
                         </Typography>
 
-                        <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
+                        {/* <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
                             <Typography sx={{ mt: 1.5, width: '100px', fontWeight: 600 }}>
                                 Chế độ:
                             </Typography>
@@ -127,10 +182,10 @@ const ListSetting = () => {
                                 }}
 
                             >
-                                <MenuItem value="Static IP">Static IP</MenuItem>
-                                <MenuItem value="DHCP">DHCP</MenuItem>
+                                <MenuItem value="MANUAL">MANUAL</MenuItem>
+                                <MenuItem value="AUTO">AUTO</MenuItem>
                             </TextField>
-                        </Box>
+                        </Box> */}
 
                         <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
                             <Typography sx={{ mt: 2.5, width: '100px', fontWeight: 600 }}>
@@ -223,8 +278,9 @@ const ListSetting = () => {
                                 }}
                                 disabled={_.isEqual(dataNetwork, originalDataNetwork)}
                                 onClick={(e) => {
+                                    SetAction('NETWORK');
                                     e.stopPropagation();
-                                    handleChangeNetwork();
+                                    handleOpenModalSetting(action);
                                 }}
                             >
                                 Cập nhật
@@ -277,8 +333,9 @@ const ListSetting = () => {
                             }}
                             disabled={_.isEqual(dataHeader, originalDataHeader)}
                             onClick={(e) => {
+                                SetAction('HEADER');
                                 e.stopPropagation();
-                                handleChangeHeader();
+                                handleOpenModalSetting(action);
                             }}
                         >
                             Cập nhật
@@ -319,8 +376,9 @@ const ListSetting = () => {
                             fontSize: 18, borderRadius: 2
                         }}
                         onClick={(e) => {
+                            SetAction('REBOOT');
                             e.stopPropagation();
-                            handleReboot();
+                            handleOpenModalSetting(action);
                         }}
                     >
                         Khởi động lại
@@ -328,6 +386,16 @@ const ListSetting = () => {
                 </Box>
             </Paper>
 
+            <ModalSetting
+                handleCloseModalSetting={handleCloseModalSetting}
+                isShowModalSetting={isShowModalSetting}
+                action={action}
+                handleChangeNetwork={handleChangeNetwork}
+                handleChangeHeader={handleChangeHeader}
+                handleReboot={handleReboot}
+            />
+
+            <Loading show={loading} />
         </>
     );
 

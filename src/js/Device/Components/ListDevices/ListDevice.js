@@ -1,5 +1,5 @@
 import {
-    useState, useEffect, Paper, Button, Box, socket,
+    useState, useEffect, Paper, Button, Box, socket, Fab,
     AddCardIcon, BorderColorIcon, DeleteForeverIcon, toast,
     ModalDelete, ModalProtocol, ModalDevice, Loading, CustomDataGrid
 } from '../../../ImportComponents/Imports';
@@ -211,29 +211,19 @@ const ListDevices = (props) => {
     return (
         <>
             < >
-                <Button
-                    variant="contained"
-                    color="success"
-                    startIcon={<AddCardIcon />}
-                    onClick={handleAddDevice}
-                    sx={{ mb: 1.5, textTransform: 'none' }}
-                >
-                    Thêm
-                </Button>
-
                 {selectedCount > 1 && (
                     <Button
                         variant="contained"
                         color="error"
                         startIcon={<DeleteForeverIcon />}
                         onClick={(e) => { e.stopPropagation(); handleDeleteDevice(); }}
-                        sx={{ mb: 1.5, ml: 1.5, textTransform: 'none' }}
+                        sx={{ mb: 1.5, ml: 0.3, textTransform: 'none' }}
                     >
-                        Xóa nhiều
+                        Xóa Nhiều
                     </Button>
                 )}
 
-                <Paper sx={{ height: 400, width: '100%' }}>
+                <Paper sx={{ height: 400, width: '100%', }}>
                     <CustomDataGrid
                         getRowId={(row) => row.id}
                         rows={listDevices || []}
@@ -256,6 +246,15 @@ const ListDevices = (props) => {
                     )}
                 </Paper>
             </>
+            <Box
+                sx={{
+                    position: 'fixed', bottom: 24, right: 24, '& > :not(style)': { m: 1 }, zIndex: 1200,    // luôn nổi trên UI
+                }}
+            >
+                <Fab color="secondary" aria-label="edit" onClick={handleAddDevice} >
+                    <AddCardIcon />
+                </Fab>
+            </Box>
 
             {/* Modal chọn protocol */}
             <ModalProtocol

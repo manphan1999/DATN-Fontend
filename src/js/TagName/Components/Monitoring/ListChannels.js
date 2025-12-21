@@ -1,5 +1,5 @@
 import {
-    useState, useEffect, Paper, Button, Box,
+    useState, useEffect, Paper, Button, Box, Fab,
     AddCardIcon, BorderColorIcon, DeleteForeverIcon, SettingsApplicationsIcon, toast,
     ModalChannel, ModalDelete, Loading, CustomDataGrid
 } from '../../../ImportComponents/Imports';
@@ -268,43 +268,22 @@ const ListChannels = (props) => {
         },
     ];
 
-
     return (
         <>
             <div >
-                <Button
-                    variant="contained"
-                    color="success"
-                    startIcon={<AddCardIcon />}
-                    onClick={() => handleAddChannel()}
-                    sx={{ mb: 1.5, textTransform: 'none' }}
-                >
-                    Thêm Tag
-                </Button>
-
-                <Button
-                    variant="contained"
-                    color="success"
-                    startIcon={<SettingsApplicationsIcon />}
-                    // onClick={handleOpenModalConfig}
-                    sx={{ mb: 1.5, ml: 1.5, textTransform: 'none' }}
-                >
-                    Cấu hình
-                </Button>
-
                 {selectedCount > 1 && (
                     <Button
                         variant="contained"
                         color="error"
                         startIcon={<DeleteForeverIcon />}
                         onClick={(e) => { e.stopPropagation(); handleDeleteDevice(); }}
-                        sx={{ mb: 1.5, mx: 1.5, textTransform: 'none' }}
+                        sx={{ mb: 1.5, ml: 0.3, textTransform: 'none' }}
                     >
-                        Xóa Tags
+                        Xóa Nhiều
                     </Button>
                 )}
 
-                <Paper sx={{ height: 600, width: '100%' }}>
+                <Paper sx={{ height: 400, width: '100%' }}>
                     <CustomDataGrid
                         rows={listChannel}
                         columns={columns}
@@ -326,6 +305,20 @@ const ListChannels = (props) => {
                     )}
                 </Paper>
             </div>
+
+            <Box
+                sx={{
+                    position: 'fixed', bottom: 24, right: 24, '& > :not(style)': { m: 1 }, zIndex: 1200,    // luôn nổi trên UI
+                }}
+            >
+                <Fab color="primary" >
+                    <SettingsApplicationsIcon />
+                </Fab>
+
+                <Fab color="secondary" onClick={handleAddChannel} >
+                    <AddCardIcon />
+                </Fab>
+            </Box>
 
             <ModalChannel
                 isShowModalChannel={isShowModalChannel}

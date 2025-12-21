@@ -1,5 +1,5 @@
 import {
-    useState, useEffect, useMemo, Paper, Button, Box,
+    useState, useEffect, useMemo, Paper, Button, Box, Fab,
     AddCardIcon, DeleteForeverIcon, SettingsApplicationsIcon, toast,
     Loading, CustomDataGrid, socket, ModalDelete, ModalConfigHistorical,
     ModalEditConfig, ModalSearchChannels, ModalTagHistorical
@@ -196,25 +196,6 @@ const ListHistorical = () => {
 
     return (
         <div>
-            <Button
-                variant="contained"
-                color="success"
-                startIcon={<AddCardIcon />}
-                onClick={handleOpenModalAdd}
-                sx={{ mb: 1.5, textTransform: 'none' }}
-            >
-                Thêm Tag
-            </Button>
-
-            <Button
-                variant="contained"
-                color="success"
-                startIcon={<SettingsApplicationsIcon />}
-                onClick={handleOpenModalConfig}
-                sx={{ mb: 1.5, ml: 1.5, textTransform: 'none' }}
-            >
-                Cấu hình
-            </Button>
 
             {selectedCount > 1 && (
                 <Button
@@ -222,9 +203,9 @@ const ListHistorical = () => {
                     color="error"
                     startIcon={<DeleteForeverIcon />}
                     onClick={(e) => { e.stopPropagation(); handleDeleteHistorical(); }}
-                    sx={{ mb: 1.5, mx: 1.5, textTransform: 'none' }}
+                    sx={{ mb: 1.5, ml: 0.3, textTransform: 'none' }}
                 >
-                    Xóa Tags
+                    Xóa Nhiều
                 </Button>
             )}
 
@@ -247,6 +228,20 @@ const ListHistorical = () => {
 
                 {loading && <Loading text="Đang tải dữ liệu..." />}
             </Paper>
+
+            <Box
+                sx={{
+                    position: 'fixed', bottom: 24, right: 24, '& > :not(style)': { m: 1 }, zIndex: 1200,    // luôn nổi trên UI
+                }}
+            >
+                <Fab color="primary" onClick={handleOpenModalConfig}>
+                    <SettingsApplicationsIcon />
+                </Fab>
+
+                <Fab color="secondary" onClick={handleOpenModalAdd} >
+                    <AddCardIcon />
+                </Fab>
+            </Box>
 
             {/* Modal thêm mới */}
             <ModalSearchChannels

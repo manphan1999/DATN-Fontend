@@ -1,7 +1,7 @@
 import {
     useState, useEffect, Paper, Button, Box, ModalSearchChannels, ModalDelete, ModalAddTagPublish,
     AddCardIcon, DeleteForeverIcon, Loading, CustomDataGrid, toast, BorderColorIcon, socket,
-    PlayCircleOutlineIcon, StopIcon, SyncIcon
+    PlayCircleOutlineIcon, StopIcon, SyncIcon, Fab, Grid
 } from '../../ImportComponents/Imports';
 import { fetchAllPublish, deletePublish, fetchAllDevices } from '../../../Services/APIDevice';
 
@@ -165,49 +165,54 @@ const ListPublishMqtt = () => {
 
     return (
         <div>
-            <Button
-                variant="contained"
-                color="success"
-                startIcon={<AddCardIcon />}
-                onClick={handleOpenModalAdd}
-                sx={{ mb: 1.5, textTransform: 'none' }}
-            >
-                Thêm
-            </Button>
-
             {listPublishMqtt.length > 0 && (
-                <>
-                    <Button
-                        variant="contained"
-                        color="primary"
-                        startIcon={<PlayCircleOutlineIcon />}
-                        onClick={handleStartMQTTServer}
-                        sx={{ ml: 1.5, mb: 1.5, textTransform: 'none' }}
-                    >
-                        Start
-                    </Button>
+                <Grid
+                    container
+                    columnSpacing={55}
+                    rowSpacing={0}
+                    sx={{ px: 25, mb: 1.5 }}
+                >
+                    <Grid item xs={4}>
+                        <Button
+                            fullWidth
+                            variant="contained"
+                            color="success"
+                            startIcon={<PlayCircleOutlineIcon />}
+                            onClick={handleStartMQTTServer}
+                            sx={{ height: 45, fontSize: 18, borderRadius: 2 }}
+                        >
+                            Start
+                        </Button>
+                    </Grid>
 
-                    <Button
-                        variant="contained"
-                        color="error"
-                        startIcon={<StopIcon />}
-                        onClick={handleStopMQTTServer}
-                        sx={{ ml: 1.5, mb: 1.5, textTransform: 'none' }}
-                    >
-                        Stop
-                    </Button>
+                    <Grid item xs={4}>
+                        <Button
+                            fullWidth
+                            variant="contained"
+                            color="error"
+                            startIcon={<StopIcon />}
+                            onClick={handleStopMQTTServer}
+                            sx={{ height: 45, fontSize: 18, borderRadius: 2 }}
+                        >
+                            Stop
+                        </Button>
+                    </Grid>
 
-                    <Button
-                        variant="contained"
-                        color="primary"
-                        startIcon={<SyncIcon />}
-                        onClick={handleReloadMQTTServer}
-                        sx={{ ml: 1.5, mb: 1.5, textTransform: 'none' }}
-                    >
-                        Reload
-                    </Button>
-                </>
+                    <Grid item xs={4}>
+                        <Button
+                            fullWidth
+                            variant="contained"
+                            color="primary"
+                            startIcon={<SyncIcon />}
+                            onClick={handleReloadMQTTServer}
+                            sx={{ height: 45, fontSize: 18, borderRadius: 2 }}
+                        >
+                            Reload
+                        </Button>
+                    </Grid>
+                </Grid>
             )}
+
 
             {selectedCount > 1 && (
                 <Button
@@ -215,9 +220,9 @@ const ListPublishMqtt = () => {
                     color="error"
                     startIcon={<DeleteForeverIcon />}
                     onClick={(e) => { e.stopPropagation(); handleDeletePublish(); }}
-                    sx={{ mb: 1.5, mx: 1.5, textTransform: 'none' }}
+                    sx={{ mb: 1.5, ml: 0.3, textTransform: 'none' }}
                 >
-                    Xóa nhiều
+                    Xóa Nhiều
                 </Button>
             )}
 
@@ -240,6 +245,16 @@ const ListPublishMqtt = () => {
 
                 {loading && <Loading text="Đang tải dữ liệu..." />}
             </Paper>
+
+            <Box
+                sx={{
+                    position: 'fixed', bottom: 24, right: 24, '& > :not(style)': { m: 1 }, zIndex: 1200,    // luôn nổi trên UI
+                }}
+            >
+                <Fab color="secondary" onClick={handleOpenModalAdd} >
+                    <AddCardIcon />
+                </Fab>
+            </Box>
 
             {/* Modal thêm mới */}
             <ModalAddTagPublish

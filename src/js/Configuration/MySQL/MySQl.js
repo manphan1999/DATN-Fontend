@@ -1,6 +1,7 @@
 import {
     useState, useEffect, Paper, Button, Box, BorderColorIcon, AddCardIcon, DeleteForeverIcon, socket,
     Loading, ModalDelete, CustomDataGrid, ModalDatabase, toast, TableViewIcon, ModalSearchChannels,
+    Fab
 } from '../../ImportComponents/Imports';
 
 import { fetchAllMySQLServer, deleteMySQLServer } from '../../../Services/APIDevice';
@@ -144,16 +145,6 @@ const ListMySQL = () => {
 
     return (
         <div>
-            <Button
-                variant="contained"
-                color="success"
-                startIcon={<AddCardIcon />}
-                sx={{ mb: 1.5, textTransform: "none" }}
-                onClick={handleOpenAdd}
-            >
-                Thêm
-            </Button>
-
             {dataDatabase.length > 0 && (
                 <Button
                     variant="contained"
@@ -195,6 +186,16 @@ const ListMySQL = () => {
                 />
                 {loading && <Loading text="Đang tải dữ liệu..." />}
             </Paper>
+
+            <Box
+                sx={{
+                    position: 'fixed', bottom: 24, right: 24, '& > :not(style)': { m: 1 }, zIndex: 1200,    // luôn nổi trên UI
+                }}
+            >
+                <Fab color="secondary" aria-label="edit" onClick={handleOpenAdd} >
+                    <AddCardIcon />
+                </Fab>
+            </Box>
 
             <ModalDatabase
                 actionAddDatabase={actionAddDatabase}

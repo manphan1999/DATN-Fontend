@@ -226,8 +226,8 @@ const ListHistorical = () => {
                 borderRadius: 2,
                 filter: 'drop-shadow(0 0 8px rgba(0,0,0,0.25))',
             }}>
-                <Stack direction="row" spacing={2} alignItems="center" sx={{ height: '100%' }}>
-                    <Box sx={{ width: '45%' }}>
+                <Stack direction="row" alignItems="center" gap={2} sx={{ width: '100%' }}>
+                    <Box sx={{ ml: 2, flex: 2 }}>
                         <CustomDateTimePicker
                             startDate={startDate}
                             endDate={endDate}
@@ -241,7 +241,7 @@ const ListHistorical = () => {
                         fullWidth
                         label="Name"
                         variant="standard"
-                        sx={{ width: '31%' }}
+                        sx={{ mx: 2, flex: 2 }}
                         value={selectedTag}
                         onChange={(e) => {
                             setSelectedTag(e.target.value);
@@ -259,19 +259,13 @@ const ListHistorical = () => {
                         ))}
                     </TextField>
 
-
                     {/* Nút tìm kiếm */}
                     <Button
                         variant="contained"
                         color="primary"
                         startIcon={<FindInPageIcon />}
                         onClick={handleFindHistorical}
-                        sx={{
-                            textTransform: 'none',
-                            height: 'fit-content',
-                            minWidth: '120px',
-                            ml: 2
-                        }}
+                        sx={{ mr: 2, flex: 1, textTransform: 'none', height: 45, fontSize: 18, borderRadius: 2 }}
                     >
                         Tìm kiếm
                     </Button>
@@ -281,11 +275,7 @@ const ListHistorical = () => {
                         color="success"
                         startIcon={<IosShareIcon />}
                         onClick={handleExportCSV}
-                        sx={{
-                            textTransform: 'none',
-                            height: 'fit-content',
-                            minWidth: '120px'
-                        }}
+                        sx={{ mr: 2, flex: 1.1, textTransform: 'none', height: 45, fontSize: 18, borderRadius: 2 }}
                         disabled={
                             selectedTag === "" ||
                             !isSearchClicked ||

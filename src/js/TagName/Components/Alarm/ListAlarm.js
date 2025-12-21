@@ -2,7 +2,7 @@ import {
     useState, useEffect, _, Typography, Checkbox, Paper, Button, BorderColorIcon,
     AddCardIcon, DeleteForeverIcon, Box, toast, SettingsApplicationsIcon, Loading,
     ModalSearchChannels, ModalDelete, CustomDataGrid, ModalAddTagAlarm, ModalConfigAlarm,
-    ModalEditApp, socket, InfoOutlinedIcon, WarningAmberIcon, ErrorIcon
+    ModalEditApp, socket, InfoOutlinedIcon, WarningAmberIcon, ErrorIcon, Fab
 } from '../../../ImportComponents/Imports';
 import { fetchAllTagAlarm, deleteTagAlarm } from "../../../../Services/APIDevice";
 
@@ -228,26 +228,6 @@ const ListAlarm = () => {
 
     return (
         <div>
-            <Button
-                variant="contained"
-                color="success"
-                startIcon={<AddCardIcon />}
-                onClick={handleopenModalAddAlarm}
-                sx={{ mb: 1.5, textTransform: 'none' }}
-            >
-                Thêm Tag
-            </Button>
-
-            <Button
-                variant="contained"
-                color="success"
-                startIcon={<SettingsApplicationsIcon />}
-                onClick={handleopenModalApp}
-                sx={{ mb: 1.5, ml: 1.5, textTransform: 'none' }}
-            >
-                Cấu hình
-            </Button>
-
             {selectedCount > 1 && (
                 <Button
                     variant="contained"
@@ -279,6 +259,20 @@ const ListAlarm = () => {
 
                 {loading && <Loading text="Đang tải dữ liệu..." />}
             </Paper>
+
+            <Box
+                sx={{
+                    position: 'fixed', bottom: 24, right: 24, '& > :not(style)': { m: 1 }, zIndex: 1200,    // luôn nổi trên UI
+                }}
+            >
+                <Fab color="primary" onClick={handleopenModalApp}>
+                    <SettingsApplicationsIcon />
+                </Fab>
+
+                <Fab color="secondary" onClick={handleopenModalAddAlarm} >
+                    <AddCardIcon />
+                </Fab>
+            </Box>
 
             {/* Modal thêm mới */}
             <ModalAddTagAlarm

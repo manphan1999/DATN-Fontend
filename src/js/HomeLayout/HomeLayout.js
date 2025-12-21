@@ -228,7 +228,7 @@ export default function HomeLayout() {
             }}
         >
             {/* Header + Toggle */}
-            <Box sx={{ mb: 2, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                 {/* <Box>
                     <Typography variant="h5" sx={{ fontWeight: 700, letterSpacing: 1 }}>
                         DASHBOARD
@@ -249,11 +249,23 @@ export default function HomeLayout() {
                 {isGrid ? (
                     <Box sx={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column' }}>
                         <Box sx={{ flex: 1, minHeight: 0, overflow: 'auto' }}>
-                            <Grid container spacing={2} justifyContent="center">
+
+                            <Box sx={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', gap: 1, }}>
+                                <Typography variant="body2" sx={{ mr: 0.5 }}>
+                                    Trang hiện tại: {rows.length === 0 ? '0 – 0 / 0' : `${startIdx + 1} – ${endIdx} / ${rows.length}`}
+                                </Typography>
+                                <IconButton size="small" onClick={handlePrev} disabled={!canPrev}>
+                                    <NavigateBeforeIcon />
+                                </IconButton>
+                                <IconButton size="small" onClick={handleNext} disabled={!canNext}>
+                                    <NavigateNextIcon />
+                                </IconButton>
+                            </Box>
+
+                            <Grid container spacing={2} justifyContent="center" sx={{ px: 2, mb: 1 }}>
                                 {pageRows.map((r) => (
                                     <Grid item key={r.id} xs={12} sm={6} md={4} lg={3}>
                                         <GaugeMini
-
                                             channel={r.channel}
                                             name={r.name}
                                             value={r.value}
@@ -266,18 +278,6 @@ export default function HomeLayout() {
                             </Grid>
                         </Box>
 
-                        <Box sx={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', gap: 1, mt: 1.5 }}>
-                            <Typography variant="body2" sx={{ mr: 0.5 }}>
-                                {rows.length === 0 ? '0 – 0 / 0' : `${startIdx + 1} – ${endIdx} / ${rows.length}`}
-                            </Typography>
-                            <IconButton size="small" onClick={handlePrev} disabled={!canPrev}>
-                                <NavigateBeforeIcon />
-                            </IconButton>
-                            <IconButton size="small" onClick={handleNext} disabled={!canNext}>
-                                <NavigateNextIcon />
-                            </IconButton>
-                        </Box>
-
                         {loading && (
                             <Paper sx={{ p: 2, mt: 2 }}>
                                 <Loading text="Đang tải dữ liệu realtime..." />
@@ -285,37 +285,24 @@ export default function HomeLayout() {
                         )}
                     </Box>
                 ) : (
-                    <Box sx={{ flex: 1, minHeight: 0 }}>
-                        <Paper
-                            sx={{
-                                p: 1,// khoảng cách table với padding
-                                width: '100%',
-                                height: '100%',
-                                maxHeight: '100%',
-                                boxSizing: 'border-box',
-                                display: 'flex',
-                                flexDirection: 'column',
+
+                    <Paper sx={{ height: 400, m: 0.5 }}>
+                        <CustomDataGrid
+                            rows={rows}
+                            columns={columns}
+                            paginationModel={paginationModel}
+                            onPaginationModelChange={setPaginationModel}
+                            pageSizeOptions={[5, 10, 20]}
+                            pagination
+                            onRowClick={handleRowClick}
+                            hideFooterSelectedRowCount
+                            loading={loading}
+                            initialState={{
+                                sorting: { sortModel: [{ field: 'channel', sort: 'asc' }] },
                             }}
-                        >
-                            <Box sx={{ flex: 1, minHeight: 0 }}>
-                                <CustomDataGrid
-                                    rows={rows}
-                                    columns={columns}
-                                    paginationModel={paginationModel}
-                                    onPaginationModelChange={setPaginationModel}
-                                    pageSizeOptions={[5, 10, 20]}
-                                    pagination
-                                    onRowClick={handleRowClick}
-                                    hideFooterSelectedRowCount
-                                    loading={loading}
-                                    initialState={{
-                                        sorting: { sortModel: [{ field: 'channel', sort: 'asc' }] },
-                                    }}
-                                />
-                            </Box>
-                            {loading && <Loading text="Đang tải dữ liệu realtime..." />}
-                        </Paper>
-                    </Box>
+                        />
+                        {loading && <Loading text="Đang tải dữ liệu realtime..." />}
+                    </Paper>
                 )}
             </Box>
 

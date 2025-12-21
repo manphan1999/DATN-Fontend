@@ -1,8 +1,8 @@
 import {
-    useState, useRef, toast, Box, Grid, Paper, TextField, Button, Typography, GoogleIcon,
-    Checkbox, FormControlLabel, Link, Stack, InputAdornment, IconButton, FacebookIcon,
-    navigate, SettingsOutlinedIcon, BoltOutlinedIcon, ThumbUpAltOutlinedIcon,
-    Visibility, VisibilityOff, AutoAwesomeOutlinedIcon, useValidator, useNavigate, useLocation
+    useState, useRef, toast, Box, Grid, Paper, TextField, Button, Typography, SupervisorAccountIcon,
+    Checkbox, FormControlLabel, Link, Stack, InputAdornment, IconButton, LockIcon,
+    SensorsOutlinedIcon, DashboardOutlinedIcon, CloudUploadOutlinedIcon, NotificationsActiveOutlinedIcon,
+    Visibility, VisibilityOff, FactoryOutlinedIcon, useValidator, useNavigate, useLocation
 } from '../ImportComponents/Imports'
 
 import { handleLoginWeb } from '../../Services/APIDevice'
@@ -104,60 +104,112 @@ const Login = () => {
                 }}
             >
                 <Box sx={{ maxWidth: 520, width: '100%' }}>
+                    {/* Title */}
                     <Typography
                         variant="h3"
                         fontWeight={800}
                         sx={{
-                            mb: 3,
+                            mb: 1,
                             fontFamily: 'Montserrat'
                         }}
                     >
                         ĐỒ ÁN TỐT NGHIỆP
                     </Typography>
 
+                    <Typography
+                        variant="h5"
+                        fontWeight={700}
+                        color="primary"
+                        sx={{ mb: 3 }}
+                    >
+                        Thiết bị thu thập dữ liệu Datalogger
+                    </Typography>
 
+                    {/* Introduction */}
+                    <Typography
+                        variant="body1"
+                        color="text.secondary"
+                        sx={{ mb: 4 }}
+                    >
+                        Datalogger là giải pháp giám sát và điều khiển thiết bị công nghiệp từ xa
+                        thông qua Internet. Hệ thống cho phép thu thập, lưu trữ và truyền dữ liệu
+                        thời gian thực, giúp quản lý và vận hành hệ thống hiệu quả.
+                    </Typography>
+
+                    {/* Features */}
                     <Box sx={{ display: 'grid', gap: 3 }}>
+                        {/* Feature 1 */}
                         <Box sx={{ display: 'flex', gap: 2 }}>
-                            <SettingsOutlinedIcon color="primary" />
+                            <SensorsOutlinedIcon color="primary" />
                             <Box>
-                                <Typography fontWeight={700}>Adaptable performance</Typography>
+                                <Typography fontWeight={700}>
+                                    Thu thập & Kết nối thiết bị
+                                </Typography>
                                 <Typography variant="body2" color="text.secondary">
-                                    Our product effortlessly adjusts to your needs, boosting efficiency and simplifying your tasks.
+                                    Kết nối PLC, cảm biến, biến tần thông qua các giao thức
+                                    Modbus RTU, Modbus TCP và MQTT.
                                 </Typography>
                             </Box>
                         </Box>
 
+                        {/* Feature 2 */}
                         <Box sx={{ display: 'flex', gap: 2 }}>
-                            <BoltOutlinedIcon color="primary" />
+                            <DashboardOutlinedIcon color="primary" />
                             <Box>
-                                <Typography fontWeight={700}>Built to last</Typography>
+                                <Typography fontWeight={700}>
+                                    Giám sát & Điều khiển từ xa
+                                </Typography>
                                 <Typography variant="body2" color="text.secondary">
-                                    Experience unmatched durability that goes above and beyond with lasting investment.
+                                    Hiển thị dữ liệu trực tuyến qua giao diện web và cho phép
+                                    điều khiển thiết bị mọi lúc, mọi nơi.
                                 </Typography>
                             </Box>
                         </Box>
 
+                        {/* Feature 3 */}
                         <Box sx={{ display: 'flex', gap: 2 }}>
-                            <ThumbUpAltOutlinedIcon color="primary" />
+                            <CloudUploadOutlinedIcon color="primary" />
                             <Box>
-                                <Typography fontWeight={700}>Great user experience</Typography>
+                                <Typography fontWeight={700}>
+                                    Lưu trữ & Truyền dữ liệu
+                                </Typography>
                                 <Typography variant="body2" color="text.secondary">
-                                    Integrate our product into your routine with an intuitive and easy-to-use interface.
+                                    Lưu dữ liệu trên server, hỗ trợ truyền dữ liệu về
+                                    FTP, MySQL, SQL và MQTT.
                                 </Typography>
                             </Box>
                         </Box>
 
+                        {/* Feature 4 */}
                         <Box sx={{ display: 'flex', gap: 2 }}>
-                            <AutoAwesomeOutlinedIcon color="primary" />
+                            <NotificationsActiveOutlinedIcon color="primary" />
                             <Box>
-                                <Typography fontWeight={700}>Innovative functionality</Typography>
+                                <Typography fontWeight={700}>
+                                    Cảnh báo & Thông báo
+                                </Typography>
                                 <Typography variant="body2" color="text.secondary">
-                                    Stay ahead with features that set new standards, addressing your evolving needs better than the rest.
+                                    Gửi cảnh báo khi có sự cố thông qua Telegram, Line
+                                    theo cấu hình người dùng.
+                                </Typography>
+                            </Box>
+                        </Box>
+
+                        {/* Feature 5 */}
+                        <Box sx={{ display: 'flex', gap: 2 }}>
+                            <FactoryOutlinedIcon color="primary" />
+                            <Box>
+                                <Typography fontWeight={700}>
+                                    Ứng dụng thực tế
+                                </Typography>
+                                <Typography variant="body2" color="text.secondary">
+                                    Ứng dụng trong nhà máy sản xuất, trạm năng lượng,
+                                    hệ thống HVAC và nông nghiệp thông minh.
                                 </Typography>
                             </Box>
                         </Box>
                     </Box>
                 </Box>
+
             </Grid>
 
             {/* Bên phải: form đăng nhập */}
@@ -168,87 +220,142 @@ const Login = () => {
                 sx={{
                     display: 'flex',
                     alignItems: 'center',
-                    justifyContent: { xs: 'center', md: 'flex-start' },
-                    pl: { md: 6 },
-                    pr: { xs: 3, md: 8 },
+                    justifyContent: 'center',
+                    px: { xs: 3, md: 8 },
                     py: { xs: 6, md: 0 },
                 }}
             >
-                <Paper elevation={8} sx={{ width: '100%', maxWidth: 460, p: { xs: 3, sm: 4 }, borderRadius: 3 }}>
-                    <Typography variant="h5" fontWeight={800} sx={{ mb: 3 }}>
-                        Sign in
+                <Paper
+                    elevation={6}
+                    sx={{
+                        width: '100%',
+                        maxWidth: 420,
+                        p: { xs: 3.5, sm: 4 },
+                        borderRadius: 4
+                    }}
+                >
+                    {/* Header */}
+                    <Typography variant="h5" fontWeight={800} textAlign="center" sx={{ mb: 2 }}>
+                        Đăng Nhập Hệ Thống
                     </Typography>
 
-                    <Box component="form" onSubmit={(e) => {
-                        e.preventDefault();
-                        handleConfirm();
-                    }}>
+                    <Typography
+                        variant="body2"
+                        color="text.secondary"
+                        textAlign="center"
+                        sx={{ mt: 0.5, mb: 3 }}
+                    >
+                        Vui lòng đăng nhập để tiếp tục
+                    </Typography>
+
+                    {/* Form */}
+                    <Box
+                        component="form"
+                        onSubmit={(e) => {
+                            e.preventDefault();
+                            handleConfirm();
+                        }}
+                        sx={{ display: 'grid', gap: 2.5 }}
+                    >
+                        {/* Username */}
                         <TextField
-                            label="User Name"
-                            variant="standard"
+                            label="Tên người dùng"
                             fullWidth
-                            sx={{ gridColumn: 'span 2' }}
                             value={dataUser.username}
                             onChange={(e) => handleInputChange(e.target.value, 'username')}
                             error={!!errors.username}
                             helperText={errors.username}
+                            InputProps={{
+                                startAdornment: (
+                                    <InputAdornment position="start">
+                                        <SupervisorAccountIcon />
+                                    </InputAdornment>
+                                )
+                            }}
                         />
 
+                        {/* Password */}
                         <TextField
                             type={showPassword ? 'text' : 'password'}
-                            label="Password"
-                            variant="standard"
+                            label="Mật khẩu"
                             fullWidth
-                            sx={{ gridColumn: 'span 2' }}
+                            inputRef={pwdRef}
                             value={dataUser.password || ''}
                             onChange={(e) => handleInputChange(e.target.value, 'password')}
                             error={!!errors.password}
                             helperText={errors.password}
                             InputProps={{
+                                startAdornment: (
+                                    <InputAdornment position="start">
+                                        <LockIcon />
+                                    </InputAdornment>
+                                ),
                                 endAdornment: (
                                     <InputAdornment position="end">
-                                        <IconButton onClick={() => { setShowPassword(!showPassword) }}  >
+                                        <IconButton
+                                            size="small"
+                                            onClick={() => setShowPassword(!showPassword)}
+                                        >
                                             {showPassword ? <VisibilityOff /> : <Visibility />}
                                         </IconButton>
                                     </InputAdornment>
                                 )
                             }}
                         />
-                        <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mt: 1 }}>
+
+                        {/* Remember + Forgot */}
+                        <Stack direction="row" alignItems="center" justifyContent="space-between">
                             <FormControlLabel
-                                control={<Checkbox checked={remember} onChange={(e) => setRemember(e.target.checked)} size="small" />}
-                                label="Remember me"
+                                control={
+                                    <Checkbox
+                                        checked={remember}
+                                        onChange={(e) => setRemember(e.target.checked)}
+                                        size="small"
+                                    />
+                                }
+                                label="Ghi nhớ đăng nhập"
                             />
-                            <Link component="button" type="button" onClick={() => toast.info('Chức năng quên mật khẩu (demo)')} underline="hover">
-                                Forgot your password?
+                            <Link
+                                component="button"
+                                type="button"
+                                underline="hover"
+                                onClick={() => toast.info('Chức năng chưa được phát triển')}
+                            >
+                                Quên mật khẩu?
                             </Link>
                         </Stack>
 
+                        {/* Submit */}
                         <Button
                             type="submit"
                             fullWidth
+                            size="large"
                             variant="contained"
                             disabled={loading}
-                            sx={{ mt: 2, py: 1.2, fontWeight: 700, borderRadius: 2 }}
+                            sx={{
+                                mt: 1,
+                                py: 1.4,
+                                fontWeight: 700,
+                                borderRadius: 3,
+                                textTransform: 'none'
+                            }}
                         >
-                            {loading ? 'Signing in…' : 'Sign in'}
+                            {loading ? 'Đang đăng nhập…' : 'Đăng nhập'}
                         </Button>
                     </Box>
 
-                    <Typography align="center" sx={{ my: 2, color: 'text.secondary' }}>
-                        or
+                    {/* Footer */}
+                    <Typography
+                        align="center"
+                        variant="caption"
+                        color="text.secondary"
+                        sx={{ mt: 3 }}
+                    >
+                        © 2025 – Đồ án tốt nghiệp | Datalogger IoT
                     </Typography>
-
-                    <Stack spacing={1.5}>
-                        <Button variant="outlined" fullWidth startIcon={<GoogleIcon />}>
-                            Sign in with Google
-                        </Button>
-                        <Button variant="outlined" fullWidth startIcon={<FacebookIcon />}>
-                            Sign in with Facebook
-                        </Button>
-                    </Stack>
                 </Paper>
             </Grid>
+
         </Grid>
     );
 }

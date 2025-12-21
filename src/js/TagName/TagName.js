@@ -26,7 +26,7 @@ const TabPanel = (props) => {
             {...other}
             style={{ width: "100%" }}
         >
-            {value === index && <Box sx={{ p: 2 }}>{children}</Box>}
+            {value === index && <Box sx={{ pt: 2 }}>{children}</Box>}
         </div>
     );
 };

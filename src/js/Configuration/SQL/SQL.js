@@ -1,6 +1,6 @@
 import {
     useState, useEffect, Paper, Button, Box, BorderColorIcon, AddCardIcon, DeleteForeverIcon, socket,
-    Loading, ModalDelete, CustomDataGrid, ModalDatabase, toast, ModalSearchChannels, TableViewIcon
+    Loading, ModalDelete, CustomDataGrid, ModalDatabase, toast, ModalSearchChannels, TableViewIcon, Fab
 } from '../../ImportComponents/Imports';
 
 import { fetchAllSQLServer, deleteSQLServer } from '../../../Services/APIDevice';
@@ -25,7 +25,6 @@ const ListSQL = () => {
 
     useEffect(() => {
         fetchAllSQL();
-        console.log('check lenght')
     }, []);
 
     const fetchAllSQL = async () => {
@@ -144,16 +143,6 @@ const ListSQL = () => {
 
     return (
         <div>
-            <Button
-                variant="contained"
-                color="success"
-                startIcon={<AddCardIcon />}
-                sx={{ mb: 1.5, textTransform: "none" }}
-                onClick={handleOpenAdd}
-            >
-                Thêm
-            </Button>
-
             {dataDatabase.length > 0 && (
                 <Button
                     variant="contained"
@@ -195,6 +184,16 @@ const ListSQL = () => {
                 />
                 {loading && <Loading text="Đang tải dữ liệu..." />}
             </Paper>
+
+            <Box
+                sx={{
+                    position: 'fixed', bottom: 24, right: 24, '& > :not(style)': { m: 1 }, zIndex: 1200,    // luôn nổi trên UI
+                }}
+            >
+                <Fab color="secondary" aria-label="edit" onClick={handleOpenAdd} >
+                    <AddCardIcon />
+                </Fab>
+            </Box>
 
             <ModalDatabase
                 actionAddDatabase={actionAddDatabase}

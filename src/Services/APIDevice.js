@@ -314,6 +314,14 @@ const fetchNetwork = () => {
     return axios.get(`/api/v1/setting/get-network`)
 }
 
+const updateNetwork = (data) => {
+    return axios.put(`/api/v1/setting/update-network`, data)
+}
+
+const rebootDevice = () => {
+    return axios.get(`/api/v1/setting/reboot`)
+}
+
 const fetchHeader = () => {
     return axios.get(`/api/v1/setting/get-header`)
 }
@@ -342,5 +350,5 @@ export {
     fetchAllRTUServer, createRTUServer, updateRTUServer, deleteRTUServer,
     fetchAllTCPServer, createTCPServer, updateTCPServer, deleteTCPServer,
     fetchAllUser, createUser, updateUser, deleteUser, handleLoginWeb,
-    fetchUser, fetchSetting, fetchNetwork, fetchHeader, createHeader, updateHeader
+    fetchUser, fetchSetting, fetchNetwork, rebootDevice, fetchHeader, createHeader, updateHeader, updateNetwork
 }

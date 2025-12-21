@@ -1,6 +1,6 @@
 import {
     useState, useEffect, Paper, Button, Box, BorderColorIcon, AddCardIcon, DeleteForeverIcon,
-    Loading, ModalDelete, CustomDataGrid, ModalAddFTPServer, toast, socket, SyncIcon
+    Loading, ModalDelete, CustomDataGrid, ModalAddFTPServer, toast, socket, SyncIcon, Fab,
 } from '../../ImportComponents/Imports';
 
 import { fetchAllFTPServer, deleteFTPServer } from '../../../Services/APIDevice';
@@ -147,16 +147,6 @@ const ListFTP = () => {
 
     return (
         <div>
-            <Button
-                variant="contained"
-                color="success"
-                startIcon={<AddCardIcon />}
-                sx={{ mb: 1.5, textTransform: "none" }}
-                onClick={handleOpenAdd}
-            >
-                Thêm
-            </Button>
-
             {dataFTPServer > 0 && (
                 <Button
                     variant="contained"
@@ -198,6 +188,16 @@ const ListFTP = () => {
                 />
                 {loading && <Loading text="Đang tải dữ liệu..." />}
             </Paper>
+
+            <Box
+                sx={{
+                    position: 'fixed', bottom: 24, right: 24, '& > :not(style)': { m: 1 }, zIndex: 1200,    // luôn nổi trên UI
+                }}
+            >
+                <Fab color="secondary" aria-label="edit" onClick={handleOpenAdd} >
+                    <AddCardIcon />
+                </Fab>
+            </Box>
 
             <ModalAddFTPServer
                 actionAddFTPServer={actionAddFTPServer}

@@ -1,7 +1,7 @@
 import {
     useState, useEffect, Paper, Button, Box, ModalSearchChannels, ModalAddTagServer,
-    AddCardIcon, DeleteForeverIcon, Loading, CustomDataGrid, BorderColorIcon,
-    ModalDelete, toast, socket, PlayCircleOutlineIcon, SyncIcon, StopIcon
+    AddCardIcon, DeleteForeverIcon, Loading, CustomDataGrid, BorderColorIcon, Grid,
+    ModalDelete, toast, socket, PlayCircleOutlineIcon, SyncIcon, StopIcon, Fab
 } from '../../ImportComponents/Imports';
 import {
     fetchAllRTUServer, fetchAllDataFormat, fetchAllDataType, fetchAllFunctionCode, deleteRTUServer,
@@ -269,48 +269,52 @@ const ListRTUServer = () => {
 
     return (
         <div>
-            <Button
-                variant="contained"
-                color="success"
-                startIcon={<AddCardIcon />}
-                onClick={handleOpenModalAdd}
-                sx={{ mb: 1.5, textTransform: 'none' }}
-            >
-                Thêm
-            </Button>
-
             {listRTUServer.length > 0 && (
-                <>
-                    <Button
-                        variant="contained"
-                        color="primary"
-                        startIcon={<PlayCircleOutlineIcon />}
-                        onClick={handleStartRTUServer}
-                        sx={{ ml: 1.5, mb: 1.5, textTransform: 'none' }}
-                    >
-                        Start
-                    </Button>
+                <Grid
+                    container
+                    columnSpacing={55}
+                    rowSpacing={0}
+                    sx={{ px: 25, mb: 1.5 }}
+                >
+                    <Grid item xs={4}>
+                        <Button
+                            fullWidth
+                            variant="contained"
+                            color="success"
+                            startIcon={<PlayCircleOutlineIcon />}
+                            onClick={handleStartRTUServer}
+                            sx={{ height: 45, fontSize: 18, borderRadius: 2 }}
+                        >
+                            Start
+                        </Button>
+                    </Grid>
 
-                    <Button
-                        variant="contained"
-                        color="error"
-                        startIcon={<StopIcon />}
-                        onClick={handleStopRTUServer}
-                        sx={{ ml: 1.5, mb: 1.5, textTransform: 'none' }}
-                    >
-                        Stop
-                    </Button>
+                    <Grid item xs={4}>
+                        <Button
+                            fullWidth
+                            variant="contained"
+                            color="error"
+                            startIcon={<StopIcon />}
+                            onClick={handleStopRTUServer}
+                            sx={{ height: 45, fontSize: 18, borderRadius: 2 }}
+                        >
+                            Stop
+                        </Button>
+                    </Grid>
 
-                    <Button
-                        variant="contained"
-                        color="primary"
-                        startIcon={<SyncIcon />}
-                        onClick={handleReloadRTUServer}
-                        sx={{ ml: 1.5, mb: 1.5, textTransform: 'none' }}
-                    >
-                        Reload
-                    </Button>
-                </>
+                    <Grid item xs={4}>
+                        <Button
+                            fullWidth
+                            variant="contained"
+                            color="primary"
+                            startIcon={<SyncIcon />}
+                            onClick={handleReloadRTUServer}
+                            sx={{ height: 45, fontSize: 18, borderRadius: 2 }}
+                        >
+                            Reload
+                        </Button>
+                    </Grid>
+                </Grid>
             )}
 
             {selectedCount > 1 && (
@@ -319,9 +323,9 @@ const ListRTUServer = () => {
                     color="error"
                     startIcon={<DeleteForeverIcon />}
                     onClick={(e) => { e.stopPropagation(); handleDeleteRTUServer(); }}
-                    sx={{ mb: 1.5, mx: 1.5, textTransform: 'none' }}
+                    sx={{ mb: 1.5, ml: 0.3, textTransform: 'none' }}
                 >
-                    Xóa nhiều
+                    Xóa Nhiều
                 </Button>
             )}
 
@@ -344,6 +348,16 @@ const ListRTUServer = () => {
 
                 {loading && <Loading text="Đang tải dữ liệu..." />}
             </Paper>
+
+            <Box
+                sx={{
+                    position: 'fixed', bottom: 24, right: 24, '& > :not(style)': { m: 1 }, zIndex: 1200,    // luôn nổi trên UI
+                }}
+            >
+                <Fab color="secondary" onClick={handleOpenModalAdd} >
+                    <AddCardIcon />
+                </Fab>
+            </Box>
 
             {/* Modal thêm mới */}
             <ModalAddTagServer
