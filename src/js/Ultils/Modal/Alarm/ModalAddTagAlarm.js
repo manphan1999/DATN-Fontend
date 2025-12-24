@@ -132,6 +132,7 @@ const ModalAddTagAlarm = (props) => {
         }
         if (res && res.EC === 0) {
             toast.success(res.EM);
+            console.log('socket.connected =', socket.connected);
             socket.emit('CHANGE ALARM');
             setDataAlarm({});
             handleClose();

@@ -5,18 +5,16 @@ import {
 } from '../src/js/ImportComponents/Imports';
 import { BrowserRouter as Router } from "react-router-dom";
 import ColorModeContext from "./js/Theme/ColorModeContext";
-
-function App() {
-
-  useEffect(() => {
-
-  })
+const App = () => {
 
   useEffect(() => {
-    socket.connect();
-    return () => {
-      socket.disconnect()
-    };
+    socket.on('connect', () => {
+      console.log('Socket connected:', socket.id);
+    });
+
+    socket.on('disconnect', () => {
+      console.log('Socket disconnected');
+    });
   }, []);
 
   const [mode, setMode] = useState(() => {

@@ -145,6 +145,7 @@ const ModalSearchChannels = (props) => {
         if (action === 'DATABASE MYSQL') {
             const res = await createTableMySQL(dataDatabase, selectedData);
             if (res && res.EC === 0) {
+                console.log('socket.connected =', socket.connected);
                 socket.emit('CREATE TABLE MYSQL');
                 toast.success(res.EM);
                 handleClose();
@@ -162,6 +163,7 @@ const ModalSearchChannels = (props) => {
         if (action === 'DATABASE SQL') {
             const res = await createTableSQL(dataDatabase, selectedData);
             if (res && res.EC === 0) {
+                console.log('socket.connected =', socket.connected);
                 socket.emit('CREATE TABLE SQL');
                 toast.success(res.EM);
                 handleClose();
@@ -177,6 +179,7 @@ const ModalSearchChannels = (props) => {
         const res = await createNewHistorical(selectedData)
         if (res && res.EC === 0) {
             toast.success(res.EM);
+            console.log('socket.connected =', socket.connected);
             socket.emit("CHANGE HISTORICAL");
             handleClose();
         } else {

@@ -1,7 +1,6 @@
 import {
-    useState, useEffect, Paper, Button, Box, ModalUser, Fab, AddIcon,
-    AddCardIcon, DeleteForeverIcon, Loading, CustomDataGrid, BorderColorIcon,
-    ModalDelete, toast
+    useState, useEffect, Paper, Button, Box, ModalUser, Fab, PersonAddIcon,
+    DeleteForeverIcon, Loading, CustomDataGrid, BorderColorIcon, ModalDelete, toast
 } from '../ImportComponents/Imports';
 import { fetchAllUser, deleteUser, fetchUser, } from '../../Services/APIDevice';
 
@@ -30,17 +29,39 @@ const ListUser = () => {
         }
     }, []);
 
+    // const fetchUsers = async () => {
+    //     setLoading(true);
+    //     let response = await fetchAllUser();
+    //     if (response && response.EC === 0 && Array.isArray(response.DT?.DT)) {
+    //         const rowsWithId = response.DT.DT.map((item) => ({
+    //             id: item._id,
+    //             username: item.username,
+    //             password: item.password
+    //         }));
+    //         setListUser(rowsWithId);
+    //     }
+    //     setLoading(false);
+    //     setSelectedCount(0);
+    // };
+
     const fetchUsers = async () => {
         setLoading(true);
+
         let response = await fetchAllUser();
+
         if (response && response.EC === 0 && Array.isArray(response.DT?.DT)) {
-            const rowsWithId = response.DT.DT.map((item) => ({
-                id: item._id,
-                username: item.username,
-                password: item.password
-            }));
+
+            const rowsWithId = response.DT.DT
+                .filter(item => item.username !== 'admin')
+                .map(item => ({
+                    id: item._id,
+                    username: item.username,
+                    password: item.password
+                }));
+
             setListUser(rowsWithId);
         }
+
         setLoading(false);
         setSelectedCount(0);
     };
@@ -125,19 +146,19 @@ const ListUser = () => {
 
     return (
         <div>
-            {selectedCount > 1 && (
+            <Box sx={{ height: 30, display: 'flex', alignItems: 'center', pb: 2 }}  >
                 <Button
                     variant="contained"
                     color="error"
                     startIcon={<DeleteForeverIcon />}
                     onClick={(e) => { e.stopPropagation(); handleDeleteUser(); }}
-                    sx={{ mt: 2.5, ml: 2, textTransform: 'none' }}
+                    sx={{ textTransform: 'none', visibility: selectedCount > 1 ? 'visible' : 'hidden', }}
                 >
                     Xóa nhiều
                 </Button>
-            )}
+            </Box>
 
-            <Paper sx={{ height: 400, m: 2 }}>
+            <Paper sx={{ height: 371, m: 2 }}>
                 <CustomDataGrid
                     rows={listUser}
                     columns={columns}
@@ -146,12 +167,11 @@ const ListUser = () => {
                     pageSizeOptions={[5, 10, 20]}
                     pagination
                     checkboxSelection
+                    loading={loading}
                     onRowSelectionModelChange={(newSelection) => {
                         setSelectedRows(newSelection);
                         setSelectedCount(newSelection.length);
                     }}
-
-                    loading={loading}
                 />
 
                 {loading && <Loading text="Đang tải dữ liệu..." />}
@@ -162,8 +182,8 @@ const ListUser = () => {
                     position: 'fixed', bottom: 24, right: 24, '& > :not(style)': { m: 1 }, zIndex: 1200,    // luôn nổi trên UI
                 }}
             >
-                <Fab color="secondary" aria-label="edit" onClick={handleOpenModalAdd} >
-                    <AddIcon />
+                <Fab color="success" aria-label="edit" onClick={handleOpenModalAdd} >
+                    <PersonAddIcon />
                 </Fab>
             </Box>
 

@@ -104,6 +104,7 @@ const ModalDatabase = (props) => {
         else if (actionAddDatabase === 'UPDATE SQL') { res = await updateSQLServer(dataDatabase); }
         if (res && res.EC === 0) {
             toast.success(res.EM);
+            console.log('socket.connected =', socket.connected);
             socket.emit('CHANGE DATABASE SERVER');
             handleCloseModalDatabase();
         }

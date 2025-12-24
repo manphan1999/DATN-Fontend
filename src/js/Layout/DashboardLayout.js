@@ -1,5 +1,5 @@
 import {
-    useState, useEffect, useContext, useTheme, useNavigate, useLocation,
+    useState, useEffect, useContext, useTheme, useNavigate, useLocation, socket,
     AppBar, Box, Drawer, Toolbar, List, ListItemButton, ListItemText, ListItemIcon,
     Typography, IconButton, Divider, Avatar, Menu, MenuItem, Paper, ListItemIcon as MenuItemIcon,
     // Icons
@@ -48,6 +48,13 @@ const DashboardLayout = () => {
             setConfigOpen(true);
         }
     }, [currentPage]);
+
+    useEffect(() => {
+        socket.connect(); // kết nối khi trang mở
+        socket.on("SERVER SEND HOME DATA", () => {
+            fetchContentHeader();
+        });
+    }, []);
 
     useEffect(() => {
         fetchContentHeader();
@@ -274,9 +281,16 @@ const DashboardLayout = () => {
 
                             <Box
                                 component="img"
-                                src="/LogoHantech.png"
+                                src="/LogoHCMUTE.png"
                                 alt="Logo Right"
-                                sx={{ width: 100, height: 50, objectFit: "contain", mr: 1.5 }}
+                                sx={{ width: 100, height: 50, objectFit: "contain" }}
+                            />
+
+                            <Box
+                                component="img"
+                                src="/LogoUTE.jpg"
+                                alt="Logo Right"
+                                sx={{ width: 100, height: 50, objectFit: "contain" }}
                             />
 
                             {/* Time/Date */}
@@ -429,7 +443,7 @@ const DashboardLayout = () => {
                                 }px)`,
                         },
                         height: "100%",
-                        maxHeight: "100%",
+                        minHeight: '100vh',
                         display: "flex",
                         flexDirection: "column",
                         transition: theme.transitions.create(["width"], {

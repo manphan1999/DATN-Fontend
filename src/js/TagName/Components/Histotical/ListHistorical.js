@@ -1,6 +1,6 @@
 import {
     useState, useEffect, useMemo, Paper, Button, Box, Fab,
-    AddCardIcon, DeleteForeverIcon, SettingsApplicationsIcon, toast,
+    NoteAddIcon, DeleteForeverIcon, SettingsApplicationsIcon, toast,
     Loading, CustomDataGrid, socket, ModalDelete, ModalConfigHistorical,
     ModalEditConfig, ModalSearchChannels, ModalTagHistorical
 } from '../../../ImportComponents/Imports';
@@ -196,20 +196,19 @@ const ListHistorical = () => {
 
     return (
         <div>
-
-            {selectedCount > 1 && (
+            <Box sx={{ height: 30, display: 'flex', alignItems: 'center', pb: 2 }}  >
                 <Button
                     variant="contained"
                     color="error"
                     startIcon={<DeleteForeverIcon />}
                     onClick={(e) => { e.stopPropagation(); handleDeleteHistorical(); }}
-                    sx={{ mb: 1.5, ml: 0.3, textTransform: 'none' }}
+                    sx={{ textTransform: 'none', visibility: selectedCount > 1 ? 'visible' : 'hidden', }}
                 >
-                    Xóa Nhiều
+                    Xóa nhiều
                 </Button>
-            )}
+            </Box>
 
-            <Paper sx={{ height: 400, width: '100%' }}>
+            <Paper sx={{ height: 371, width: '100%' }}>
                 <CustomDataGrid
                     rows={_listHistorical}
                     columns={columns}
@@ -238,8 +237,8 @@ const ListHistorical = () => {
                     <SettingsApplicationsIcon />
                 </Fab>
 
-                <Fab color="secondary" onClick={handleOpenModalAdd} >
-                    <AddCardIcon />
+                <Fab color="success" onClick={handleOpenModalAdd} >
+                    <NoteAddIcon />
                 </Fab>
             </Box>
 

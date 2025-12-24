@@ -78,7 +78,7 @@ const ListCom = (props) => {
         <>
             <div >
 
-                <Paper sx={{ height: 400, width: '100%' }}>
+                <Paper sx={{ height: 371, width: '100%' }}>
                     <CustomDataGrid
                         rows={listComs}
                         columns={columns}

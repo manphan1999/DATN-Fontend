@@ -148,6 +148,7 @@ const ModalAddTagPublish = (props) => {
             res = await updatePublish(dataPublish);
         }
         if (res && res.EC === 0) {
+            console.log('socket.connected =', socket.connected);
             toast.success(res.EM);
             handleClose();
         } else {

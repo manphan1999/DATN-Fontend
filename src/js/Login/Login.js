@@ -63,14 +63,13 @@ const Login = () => {
             if (res && res.DT?.access_token) {
                 localStorage.setItem('accessToken', res.DT.access_token);
                 localStorage.setItem('username', dataUser.username);
-
-                toast.success("Đăng nhập thành công!");
+                toast.success(res.EM);
                 const redirect = localStorage.getItem("redirectAfterLogin") || '/home';
                 localStorage.removeItem("redirectAfterLogin");
 
                 navigate(redirect);
             } else {
-                toast.error(res?.EM || "Login failed");
+                toast.error(res.EM);
                 clearPassword();
             }
 
@@ -109,8 +108,8 @@ const Login = () => {
                         variant="h3"
                         fontWeight={800}
                         sx={{
-                            mb: 1,
-                            fontFamily: 'Montserrat'
+                            mb: 2,
+                            fontFamily: 'tahoma'
                         }}
                     >
                         ĐỒ ÁN TỐT NGHIỆP
@@ -122,7 +121,7 @@ const Login = () => {
                         color="primary"
                         sx={{ mb: 3 }}
                     >
-                        Thiết bị thu thập dữ liệu Datalogger
+                        Thiết bị giám sát và thu thập dữ liệu Datalogger
                     </Typography>
 
                     {/* Introduction */}
@@ -131,9 +130,8 @@ const Login = () => {
                         color="text.secondary"
                         sx={{ mb: 4 }}
                     >
-                        Datalogger là giải pháp giám sát và điều khiển thiết bị công nghiệp từ xa
-                        thông qua Internet. Hệ thống cho phép thu thập, lưu trữ và truyền dữ liệu
-                        thời gian thực, giúp quản lý và vận hành hệ thống hiệu quả.
+                        Datalogger là thiết bị giám sát và điều khiển thiết bị công nghiệp từ xa thông qua Internet.
+                        Hệ thống cho phép thu thập, lưu trữ và truyền dữ liệu thời gian thực, giúp quản lý và vận hành hệ thống hiệu quả.
                     </Typography>
 
                     {/* Features */}
@@ -226,7 +224,7 @@ const Login = () => {
                 }}
             >
                 <Paper
-                    elevation={6}
+                    elevation={20}
                     sx={{
                         width: '100%',
                         maxWidth: 420,
@@ -319,7 +317,7 @@ const Login = () => {
                                 component="button"
                                 type="button"
                                 underline="hover"
-                                onClick={() => toast.info('Chức năng chưa được phát triển')}
+                                onClick={() => toast.info('Chức năng đang được phát triển')}
                             >
                                 Quên mật khẩu?
                             </Link>

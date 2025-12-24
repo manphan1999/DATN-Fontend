@@ -1,6 +1,6 @@
 import {
     useState, useEffect, Paper, Button, Box, socket, Fab,
-    AddCardIcon, BorderColorIcon, DeleteForeverIcon, toast,
+    PlaylistAddIcon, BorderColorIcon, DeleteForeverIcon, toast,
     ModalDelete, ModalProtocol, ModalDevice, Loading, CustomDataGrid
 } from '../../../ImportComponents/Imports';
 import { fetchAllDevices, deleteDevice, fetchAllComs, fetchAllProtocol } from "../../../../Services/APIDevice";
@@ -211,19 +211,19 @@ const ListDevices = (props) => {
     return (
         <>
             < >
-                {selectedCount > 1 && (
+                <Box sx={{ height: 30, display: 'flex', alignItems: 'center', pb: 2 }}  >
                     <Button
                         variant="contained"
                         color="error"
                         startIcon={<DeleteForeverIcon />}
                         onClick={(e) => { e.stopPropagation(); handleDeleteDevice(); }}
-                        sx={{ mb: 1.5, ml: 0.3, textTransform: 'none' }}
+                        sx={{ textTransform: 'none', visibility: selectedCount > 1 ? 'visible' : 'hidden', }}
                     >
-                        Xóa Nhiều
+                        Xóa nhiều
                     </Button>
-                )}
+                </Box>
 
-                <Paper sx={{ height: 400, width: '100%', }}>
+                <Paper sx={{ height: 371, width: '100%', }}>
                     <CustomDataGrid
                         getRowId={(row) => row.id}
                         rows={listDevices || []}
@@ -251,8 +251,8 @@ const ListDevices = (props) => {
                     position: 'fixed', bottom: 24, right: 24, '& > :not(style)': { m: 1 }, zIndex: 1200,    // luôn nổi trên UI
                 }}
             >
-                <Fab color="secondary" aria-label="edit" onClick={handleAddDevice} >
-                    <AddCardIcon />
+                <Fab color="success" onClick={handleAddDevice} >
+                    <PlaylistAddIcon />
                 </Fab>
             </Box>
 

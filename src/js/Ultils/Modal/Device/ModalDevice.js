@@ -220,6 +220,7 @@ const ModalDevice = (props) => {
             : await updateCurrentDevice(dataToUpdate);
         if (res && res.EC === 0) {
             toast.success(res.EM);
+            console.log('socket.connected =', socket.connected);
             socket.emit('CHANGE DEVICE');
             handleClose();
         } else {

@@ -87,6 +87,7 @@ const ModalEditConfig = (props) => {
         let res = await updateConfigHistorical(dataToUpdate)
         if (res && res && res.EC === 0) {
             toast.success(res.EM)
+            console.log('socket.connected =', socket.connected);
             socket.emit("CHANGE HISTORICAL");
             handleClose()
         } else {

@@ -147,31 +147,19 @@ const ListFTP = () => {
 
     return (
         <div>
-            {dataFTPServer > 0 && (
-                <Button
-                    variant="contained"
-                    color="success"
-                    startIcon={<SyncIcon />}
-                    sx={{ mb: 1.5, ml: 1.5, textTransform: "none" }}
-                    onClick={handleSyncFTP}
-                >
-                    Đồng bộ
-                </Button>
-            )}
-
-            {selectedCount > 1 && (
+            <Box sx={{ height: 30, display: 'flex', alignItems: 'center', pb: 2 }}  >
                 <Button
                     variant="contained"
                     color="error"
                     startIcon={<DeleteForeverIcon />}
-                    sx={{ mb: 1.5, ml: 1.5, textTransform: "none" }}
-                    onClick={() => handleDeleteFTPServer()}
+                    onClick={(e) => { e.stopPropagation(); handleDeleteFTPServer(); }}
+                    sx={{ textTransform: 'none', visibility: selectedCount > 1 ? 'visible' : 'hidden', }}
                 >
                     Xóa nhiều
                 </Button>
-            )}
+            </Box>
 
-            <Paper sx={{ height: 370, width: "100%" }}>
+            <Paper sx={{ height: 371, width: "100%" }}>
                 <CustomDataGrid
                     rows={dataFTPServer}
                     columns={columns}
@@ -194,7 +182,12 @@ const ListFTP = () => {
                     position: 'fixed', bottom: 24, right: 24, '& > :not(style)': { m: 1 }, zIndex: 1200,    // luôn nổi trên UI
                 }}
             >
-                <Fab color="secondary" aria-label="edit" onClick={handleOpenAdd} >
+                {dataFTPServer.length > 0 && (
+                    <Fab color="primary" onClick={handleSyncFTP} >
+                        <SyncIcon />
+                    </Fab>
+                )}
+                <Fab color="success" onClick={handleOpenAdd} >
                     <AddCardIcon />
                 </Fab>
             </Box>

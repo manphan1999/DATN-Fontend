@@ -3,29 +3,35 @@ import {
     CustomDataGrid, HelpOutlineIcon, CheckCircleIcon, WarningAmberIcon, ErrorIcon, SensorsOffIcon,
     TableRowsIcon, ViewModuleIcon, NavigateBeforeIcon, NavigateNextIcon, toast, InputPopover
 } from '../ImportComponents/Imports';
-
 /* =============== Mini Gauge (SVG) =============== */
-const GaugeMini = ({ value, unit, channel, name, status, handleRowClick }) => {
+const GaugeMini = ({ value, unit, channel, name, permission, status, handleRowClick }) => {
     const H = 100, W = 100;
     const cx = 50, cy = 50, r = 50;
 
     const isNormal = status === 'Normal';
-    const cardBg = isNormal ? 'rgba(78, 183, 83, 1)' : 'rgba(211,47,47,.95)';
-    const cardBorder = isNormal ? 'rgba(46,125,50,1)' : 'rgba(211,47,47,1)';
-
     return (
         <Paper
-            elevation={0} onClick={handleRowClick}
+            elevation={0} onClick={permission ? handleRowClick : undefined}
             sx={{
                 borderRadius: 5,
                 p: 2,
                 border: '1px solid',
-                borderColor: cardBorder,
-                bgcolor: cardBg,
+                borderColor: isNormal ? 'rgba(46,125,50,1)' : 'rgba(211,47,47,1)',
+                bgcolor: isNormal ? 'rgba(78,183,83,1)' : 'rgba(211,47,47,.95)',
                 height: '100%',
                 display: 'flex',
                 flexDirection: 'column',
                 gap: 1,
+                cursor: permission ? 'pointer' : 'default',
+                transition: 'all 0.25s ease',
+
+                ...(permission && {
+                    '&:hover': {
+                        transform: 'translateY(-1px)',
+                        boxShadow: '0 5px 10px rgba(0,0,0,0.25)',
+                        filter: 'brightness(1.05)',
+                    }
+                }),
             }}
         >
             {/* Channel pill */}
@@ -74,13 +80,13 @@ const GaugeMini = ({ value, unit, channel, name, status, handleRowClick }) => {
 /* =============== Main =============== */
 const PAGE_SIZE_GRID = 12; // 4 x 3
 
-export default function HomeLayout() {
+const HomeLayout = () => {
     const [rows, setRows] = useState([]);
     const [loading, setLoading] = useState(true);
     const [anchorEl, setAnchorEl] = useState(null);
     const [selectedRow, setSelectedRow] = useState(null);
     // DataGrid pagination
-    const [paginationModel, setPaginationModel] = useState({ page: 0, pageSize: 5 });
+    const [paginationModel, setPaginationModel] = useState({ page: 0, pageSize: 10 });
     // view toggle
     const [isGrid, setIsGrid] = useState(true);
     const toggleView = () => setIsGrid((v) => !v);
@@ -101,42 +107,45 @@ export default function HomeLayout() {
 
     // Socket realtime
     useEffect(() => {
-        socket.connect();
+        socket.connect(); // kết nối khi trang mở
 
-        const onHomeData = (data) => {
-            const mapped = (Array.isArray(data) ? data : []).map((item) => {
-                let statusText = 'Sample';
-                if (item.status === 1) statusText = 'Normal';
-                else if (item.status === 2) statusText = 'Over range';
-                else if (item.status === 3) statusText = 'Disconnect';
-
+        socket.on("SERVER SEND HOME DATA", (data) => {
+            const mapped = data.map((item, index) => {
+                console.log('status: string_status -> ', item.status)
+                let string_status;
+                if (item.status === 1) {
+                    string_status = "Normal";
+                } else if (item.status === 2) {
+                    string_status = "Over range";
+                } else if (item.status === 3) {
+                    string_status = "Disconnect";
+                } else {
+                    string_status = "Sample";
+                }
                 return {
+                    id: item.tagnameId || index,
                     name: item.tagname,
-                    channel: Number(item.channel ?? 0),
-                    deviceName: item.deviceName,//deviceMap[item.deviceId] || item.deviceId || '',
-                    deviceId: item.deviceId,
-                    symbol: item.symbol,
+                    realValue: item.rawValue,
                     value: item.value,
-                    unit: item.unit,
-                    status: statusText,
+                    channel: item.channel,
+                    symbol: item.symbol,
+                    deviceId: item.deviceId,
                     slaveId: item.slaveId,
                     address: item.address,
                     functionCode: item.functionCode,
                     dataFormat: item.dataFormat,
                     dataType: item.dataType,
                     permission: item.permission,
+                    status: string_status,
                 };
             });
-
             const sorted = mapped
                 .sort((a, b) => a.channel - b.channel)
                 .map((it, idx) => ({ ...it, id: idx + 1 }));
 
             setRows(sorted);
             setLoading(false);
-        };
-
-        socket.on('SERVER SEND HOME DATA', onHomeData);
+        });
         socket.on("SERVER WRITE RESULT", (res) => {
             if (res.success) {
                 toast.success(res.message || "Ghi thành công!");
@@ -146,7 +155,7 @@ export default function HomeLayout() {
         });
         return () => {
             socket.off("SERVER WRITE RESULT");
-            socket.off('SERVER SEND HOME DATA', onHomeData);
+            socket.off("SERVER SEND HOME DATA");
             socket.disconnect();
         };
     }, []);
@@ -248,10 +257,10 @@ export default function HomeLayout() {
             <Box sx={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column' }}>
                 {isGrid ? (
                     <Box sx={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column' }}>
-                        <Box sx={{ flex: 1, minHeight: 0, overflow: 'auto' }}>
+                        <Box sx={{ flex: 1, minHeight: 0, }}>
 
-                            <Box sx={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', gap: 1, }}>
-                                <Typography variant="body2" sx={{ mr: 0.5 }}>
+                            <Box sx={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', gap: 1, mx: 1, mb: 1 }}>
+                                <Typography variant="body2" >
                                     Trang hiện tại: {rows.length === 0 ? '0 – 0 / 0' : `${startIdx + 1} – ${endIdx} / ${rows.length}`}
                                 </Typography>
                                 <IconButton size="small" onClick={handlePrev} disabled={!canPrev}>
@@ -271,34 +280,38 @@ export default function HomeLayout() {
                                             value={r.value}
                                             unit={r.unit}
                                             status={r.status}
+                                            permission={r.permission}
                                             handleRowClick={(event) => handleRowClick({ row: r }, event)}
                                         />
                                     </Grid>
                                 ))}
                             </Grid>
+                            <Loading show={loading} text="Đang tải dữ liệu realtime..." />
                         </Box>
-
-                        {loading && (
-                            <Paper sx={{ p: 2, mt: 2 }}>
-                                <Loading text="Đang tải dữ liệu realtime..." />
-                            </Paper>
-                        )}
                     </Box>
                 ) : (
-
-                    <Paper sx={{ height: 400, m: 0.5 }}>
+                    <Paper sx={{ height: 631, m: 1.5 }}>
                         <CustomDataGrid
                             rows={rows}
                             columns={columns}
                             paginationModel={paginationModel}
                             onPaginationModelChange={setPaginationModel}
-                            pageSizeOptions={[5, 10, 20]}
+                            pageSizeOptions={[10, 20, 30]}
                             pagination
                             onRowClick={handleRowClick}
                             hideFooterSelectedRowCount
                             loading={loading}
                             initialState={{
                                 sorting: { sortModel: [{ field: 'channel', sort: 'asc' }] },
+                            }}
+                            getRowClassName={(params) =>
+                                params.row.permission ? 'permission-row' : 'readonly-row'
+                            }
+                            sx={{
+                                '& .permission-row:hover': {
+                                    cursor: 'pointer',
+                                    backgroundColor: 'rgba(25,118,210,0.08)',
+                                },
                             }}
                         />
                         {loading && <Loading text="Đang tải dữ liệu realtime..." />}
@@ -318,3 +331,4 @@ export default function HomeLayout() {
         </Box>
     );
 }
+export default HomeLayout;

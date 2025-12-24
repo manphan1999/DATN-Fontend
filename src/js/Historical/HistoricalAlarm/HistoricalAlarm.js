@@ -87,6 +87,7 @@ const ListAlarm = () => {
             const selectedTagObj = listTagAlarm.find(tag => tag.tagnameId === selectedTag);
             const tagNameId = selectedTagObj ? selectedTagObj.tagnameId : "";
             const response = await findAlarmTime({ startTime, endTime, tagNameId });
+            console.log('check report: ', response)
             if (response && response.EC === 0 && Array.isArray(response.DT)) {
                 const rows = response.DT.map((item, index) => ({
                     id: index + 1,
@@ -136,18 +137,18 @@ const ListAlarm = () => {
     };
 
     const columns = [
-        { field: 'id', headerName: 'STT', width: 100, align: 'center', headerAlign: 'center' },
-        { field: 'timestamp', headerName: 'Date and Time', width: 160, align: 'center', headerAlign: 'center' },
+        { field: 'id', headerName: 'STT', flex: 1, align: 'center', headerAlign: 'center' },
+        { field: 'timestamp', headerName: 'Date and Time', flex: 1, align: 'center', headerAlign: 'center' },
         { field: 'tagname', headerName: 'Name', flex: 1, align: 'center', headerAlign: 'center' },
         { field: 'value', headerName: 'Value', flex: 1, align: 'center', headerAlign: 'center' },
-        { field: 'condition', headerName: 'Condition', width: 100, align: 'center', headerAlign: 'center' },
-        { field: 'rangeAlarm', headerName: 'Range', flex: 1, align: 'center', headerAlign: 'center' },
+        { field: 'condition', headerName: 'Condition', align: 'center', headerAlign: 'center' },
+        { field: 'rangeAlarm', headerName: 'Range Alarm', flex: 1, align: 'center', headerAlign: 'center' },
         { field: 'title', headerName: 'Title', flex: 1, align: 'center', headerAlign: 'center' },
         { field: 'content', headerName: 'Content', flex: 1, align: 'center', headerAlign: 'center' },
         {
             field: "type",
             headerName: "Type",
-            width: 250,
+            flex: 1,
             headerAlign: "center",
             align: "center",
             renderCell: (params) => {
@@ -288,11 +289,8 @@ const ListAlarm = () => {
                         },
                     }}
                 />
-
-                {loading && <Loading text="Đang tải dữ liệu..." />
-                }
+                {loading && <Loading text="Đang tải dữ liệu..." />}
             </Paper>
-
         </div >
     );
 }

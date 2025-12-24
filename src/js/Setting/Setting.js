@@ -1,7 +1,7 @@
 import {
     useState, useEffect, Paper, Button, Box, Typography, SaveIcon,
     RestartAltIcon, Loading, BorderColorIcon, CancelPresentation,
-    TextField, toast, _, useValidator, ModalSetting,
+    TextField, toast, _, useValidator, ModalSetting, socket,
 } from '../ImportComponents/Imports';
 
 import { fetchSetting, fetchNetwork, rebootDevice, fetchHeader, updateHeader, updateNetwork } from '../../Services/APIDevice';
@@ -145,6 +145,8 @@ const ListSetting = () => {
             setEnableConfigHeader(false);
             handleCloseModalSetting();
             fetchContentHeader();
+            console.log('socket.connected =', socket.connected);
+            socket.emit('UPDATE HEADER');
         }
     }
 
@@ -394,8 +396,7 @@ const ListSetting = () => {
                 handleChangeHeader={handleChangeHeader}
                 handleReboot={handleReboot}
             />
-
-            <Loading show={loading} />
+            <Loading show={loading} text="Đang tải dữ liệu..." />
         </>
     );
 

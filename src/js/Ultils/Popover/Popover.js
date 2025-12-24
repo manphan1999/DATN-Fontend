@@ -18,10 +18,21 @@ const InputPopover = ({
     const { validate } = useValidator();
 
     useEffect(() => {
+        const token = localStorage.getItem('accessToken');
+        if (open) {
+            if (!token) {
+                window.location.href = '/login';
+            } else {
+            }
+        }
+    }, [open]);
+
+    useEffect(() => {
         if (open) {
             setInputValue(defaultValue);
             setErrors({});
         }
+        console.log('open: ', open)
     }, [open, defaultValue]);
 
     const handleInputChange = (value, name) => {

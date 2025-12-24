@@ -143,29 +143,17 @@ const ListSQL = () => {
 
     return (
         <div>
-            {dataDatabase.length > 0 && (
-                <Button
-                    variant="contained"
-                    color="success"
-                    startIcon={<TableViewIcon />}
-                    sx={{ ml: 1.5, mb: 1.5, textTransform: "none" }}
-                    onClick={handleOpenSearch}
-                >
-                    Tạo Bảng
-                </Button>
-            )}
-
-            {selectedCount > 1 && (
+            <Box sx={{ height: 30, display: 'flex', alignItems: 'center', pb: 2 }}  >
                 <Button
                     variant="contained"
                     color="error"
                     startIcon={<DeleteForeverIcon />}
-                    sx={{ mb: 1.5, ml: 1.5, textTransform: "none" }}
-                    onClick={() => handledeleteSQL()}
+                    onClick={(e) => { e.stopPropagation(); handledeleteSQL(); }}
+                    sx={{ textTransform: 'none', visibility: selectedCount > 1 ? 'visible' : 'hidden', }}
                 >
                     Xóa nhiều
                 </Button>
-            )}
+            </Box>
 
             <Paper sx={{ height: 371, width: "100%" }}>
                 <CustomDataGrid
@@ -190,7 +178,12 @@ const ListSQL = () => {
                     position: 'fixed', bottom: 24, right: 24, '& > :not(style)': { m: 1 }, zIndex: 1200,    // luôn nổi trên UI
                 }}
             >
-                <Fab color="secondary" aria-label="edit" onClick={handleOpenAdd} >
+                {dataDatabase.length > 0 && (
+                    <Fab color="primary" onClick={handleOpenSearch} >
+                        <TableViewIcon />
+                    </Fab>
+                )}
+                <Fab color="success" onClick={handleOpenAdd} >
                     <AddCardIcon />
                 </Fab>
             </Box>

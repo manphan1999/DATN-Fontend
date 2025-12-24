@@ -1,6 +1,6 @@
 import {
     useState, useEffect, Paper, Button, Box, ModalSearchChannels, ModalDelete, ModalAddTagPublish,
-    AddCardIcon, DeleteForeverIcon, Loading, CustomDataGrid, toast, BorderColorIcon, socket,
+    AddBoxIcon, DeleteForeverIcon, Loading, CustomDataGrid, toast, BorderColorIcon, socket,
     PlayCircleOutlineIcon, StopIcon, SyncIcon, Fab, Grid
 } from '../../ImportComponents/Imports';
 import { fetchAllPublish, deletePublish, fetchAllDevices } from '../../../Services/APIDevice';
@@ -165,7 +165,7 @@ const ListPublishMqtt = () => {
 
     return (
         <div>
-            {listPublishMqtt.length > 0 && (
+            {listPublishMqtt.length >= 0 && (
                 <Grid
                     container
                     columnSpacing={55}
@@ -213,18 +213,17 @@ const ListPublishMqtt = () => {
                 </Grid>
             )}
 
-
-            {selectedCount > 1 && (
+            <Box sx={{ height: 30, display: 'flex', alignItems: 'center', pb: 2 }}  >
                 <Button
                     variant="contained"
                     color="error"
                     startIcon={<DeleteForeverIcon />}
                     onClick={(e) => { e.stopPropagation(); handleDeletePublish(); }}
-                    sx={{ mb: 1.5, ml: 0.3, textTransform: 'none' }}
+                    sx={{ textTransform: 'none', visibility: selectedCount > 1 ? 'visible' : 'hidden', }}
                 >
-                    Xóa Nhiều
+                    Xóa nhiều
                 </Button>
-            )}
+            </Box>
 
             <Paper sx={{ height: 400, width: '100%' }}>
                 <CustomDataGrid
@@ -251,8 +250,8 @@ const ListPublishMqtt = () => {
                     position: 'fixed', bottom: 24, right: 24, '& > :not(style)': { m: 1 }, zIndex: 1200,    // luôn nổi trên UI
                 }}
             >
-                <Fab color="secondary" onClick={handleOpenModalAdd} >
-                    <AddCardIcon />
+                <Fab color="success" onClick={handleOpenModalAdd} >
+                    <AddBoxIcon />
                 </Fab>
             </Box>
 

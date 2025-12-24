@@ -46,12 +46,12 @@ const ModalDelete = (props) => {
                     width: 400,              // chỉnh chiều rộng
                     bgcolor: "#f9f9f9",      // đổi màu background
                     borderRadius: 2,         // bo góc
-                    p: 2,                    // padding
+                    p: 1,                    // padding
                 },
             }}
         >
             {/* Tiêu đề */}
-            <DialogTitle sx={{ fontWeight: 600, textAlign: "center", position: "relative", top: "-15px" }}>
+            <DialogTitle sx={{ fontWeight: 600, textAlign: "center", position: "relative", top: "-15px", fontSize: 22, }}>
                 Xác nhận xoá ?
             </DialogTitle>
             {/* Nút đóng */}
@@ -68,7 +68,7 @@ const ModalDelete = (props) => {
                 <CancelIcon sx={{ fontSize: { xs: 24, md: 32 } }} />
             </IconButton>
             {/* Nội dung */}
-            <DialogContent sx={{ fontWeight: 600, textAlign: "center", position: "relative", top: "-15px" }}>
+            <DialogContent sx={{ fontWeight: 600, textAlign: "center", position: "relative", top: "-15px", fontSize: 20, }}>
                 <Typography> Số hàng đã chọn : {selectedCount}</Typography>
             </DialogContent>
 
@@ -81,6 +81,8 @@ const ModalDelete = (props) => {
                         width: '110px',
                         bgcolor: '#ef4444',
                         "&:hover": { bgcolor: '#dc2626' },
+                        textTransform: "none", height: 45, minWidth: 150,
+                        fontSize: 20, borderRadius: 2,
                     }}
                 >
                     Hủy
@@ -93,6 +95,8 @@ const ModalDelete = (props) => {
                         width: '110px',
                         bgcolor: '#1657beff',
                         "&:hover": { bgcolor: '#2563eb' },
+                        textTransform: "none", height: 45, minWidth: 150,
+                        fontSize: 20, borderRadius: 2,
                     }}
                 >
                     Xác nhận

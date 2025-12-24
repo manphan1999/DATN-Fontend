@@ -1,6 +1,6 @@
 import {
     useState, useEffect, Paper, Button, Box, Fab,
-    AddCardIcon, BorderColorIcon, DeleteForeverIcon, SettingsApplicationsIcon, toast,
+    NoteAddIcon, BorderColorIcon, DeleteForeverIcon, SettingsApplicationsIcon, toast,
     ModalChannel, ModalDelete, Loading, CustomDataGrid
 } from '../../../ImportComponents/Imports';
 import {
@@ -204,6 +204,9 @@ const ListChannels = (props) => {
         setisShowModalDelete(true);
     };
 
+    const handleConfigChannel = () => {
+        toast.info('Chức năng đang được phát triển');
+    }
 
     const conformDeleteChannel = async () => {
         let res = await deleteChannel({ ids: dataModalDelete });
@@ -271,19 +274,19 @@ const ListChannels = (props) => {
     return (
         <>
             <div >
-                {selectedCount > 1 && (
+                <Box sx={{ height: 30, display: 'flex', alignItems: 'center', pb: 2 }}  >
                     <Button
                         variant="contained"
                         color="error"
                         startIcon={<DeleteForeverIcon />}
                         onClick={(e) => { e.stopPropagation(); handleDeleteDevice(); }}
-                        sx={{ mb: 1.5, ml: 0.3, textTransform: 'none' }}
+                        sx={{ textTransform: 'none', visibility: selectedCount > 1 ? 'visible' : 'hidden', }}
                     >
-                        Xóa Nhiều
+                        Xóa nhiều
                     </Button>
-                )}
+                </Box>
 
-                <Paper sx={{ height: 400, width: '100%' }}>
+                <Paper sx={{ height: 371, width: '100%' }}>
                     <CustomDataGrid
                         rows={listChannel}
                         columns={columns}
@@ -311,12 +314,12 @@ const ListChannels = (props) => {
                     position: 'fixed', bottom: 24, right: 24, '& > :not(style)': { m: 1 }, zIndex: 1200,    // luôn nổi trên UI
                 }}
             >
-                <Fab color="primary" >
+                <Fab color="primary" onClick={handleConfigChannel}>
                     <SettingsApplicationsIcon />
                 </Fab>
 
-                <Fab color="secondary" onClick={handleAddChannel} >
-                    <AddCardIcon />
+                <Fab color="success" onClick={handleAddChannel} >
+                    <NoteAddIcon />
                 </Fab>
             </Box>
 

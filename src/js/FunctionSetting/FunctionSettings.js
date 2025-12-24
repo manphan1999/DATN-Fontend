@@ -1,6 +1,6 @@
 import {
     useState, useEffect, Chip, Box, Button, Paper, LinearProgress,
-    AddCardIcon, BorderColorIcon, DeleteForeverIcon, toast,
+    AddCardIcon, BorderColorIcon, DeleteForeverIcon, toast, Fab,
     CheckCircleIcon, ErrorIcon, WarningAmberIcon, SensorsOffIcon, HelpOutlineIcon,
     socket, CustomDataGrid, ModalChannel, ModalDelete, Loading, InputPopover
 } from '../ImportComponents/Imports';
@@ -41,6 +41,7 @@ const FunctionSettings = (props) => {
 
         socket.on("SERVER SEND HOME DATA", (data) => {
             const mapped = data.map((item, index) => {
+                console.log('status: string_status -> ', item.status)
                 let string_status;
                 if (item.status === 1) {
                     string_status = "Normal";
@@ -445,30 +446,20 @@ const FunctionSettings = (props) => {
 
     return (
         <>
-            <div className='container'>
-                <Button
-                    variant="contained"
-                    color="success"
-                    startIcon={<AddCardIcon />}
-                    onClick={handleAddChannel}
-                    sx={{ my: 1.5, textTransform: 'none' }}
-                >
-                    Thêm Tag
-                </Button>
-
-                {selectedCount > 0 && (
+            <div >
+                <Box sx={{ height: 60, display: 'flex', alignItems: 'center', pb: 2 }}  >
                     <Button
                         variant="contained"
                         color="error"
                         startIcon={<DeleteForeverIcon />}
                         onClick={(e) => { e.stopPropagation(); handleDeleteDevice(); }}
-                        sx={{ my: 1.5, ml: 1.5, textTransform: 'none' }}
+                        sx={{ textTransform: 'none', visibility: selectedCount > 1 ? 'visible' : 'hidden', }}
                     >
-                        Xóa thiết bị
+                        Xóa nhiều
                     </Button>
-                )}
+                </Box>
 
-                <Paper sx={{ height: 600, width: '100%' }}>
+                <Paper sx={{ height: 600, mx: 2 }}>
                     <CustomDataGrid
                         rows={listChannel}
                         columns={columns}
@@ -487,27 +478,37 @@ const FunctionSettings = (props) => {
                     {loading && <Loading text="Đang tải dữ liệu..." />}
                 </Paper>
 
-                <Paper sx={{ mt: 1 }}>
-                    <LinearProgress color="success" />
-                    <Box sx={{ mt: 3, fontSize: 25, textAlign: "center", mt: 2, fontWeight: 600 }}>
+                <Paper sx={{ mt: 1, mx: 2 }}>
+                    <LinearProgress color="primary" />
+                    <Box sx={{ my: 1, fontSize: 25, textAlign: "center", fontWeight: 800 }}>
                         GIÁ TRỊ CHƯA QUA XỬ LÝ
                     </Box>
-                    <Box sx={{ mt: 3, height: 300, width: "100%" }}>
-                        <CustomDataGrid
-                            rows={listDataSocket}
-                            columns={column_value}
-                            hideFooterSelectedRowCount={true}
-                            paginationModel={paginationModel}
-                            onPaginationModelChange={setPaginationModel}
-                            pageSizeOptions={[5, 10, 20]}
-                            pagination
-                            onRowClick={handleRowClick}
-                            loading={loading}
-                        />
-                        {loading && <Loading text="Đang tải dữ liệu..." />}
-                    </Box>
+                    {/* <LinearProgress color="success" /> */}
                 </Paper>
-            </div>
+                <Paper sx={{ mt: 1, mx: 2, height: 300, }}>
+                    <CustomDataGrid
+                        rows={listDataSocket}
+                        columns={column_value}
+                        hideFooterSelectedRowCount={true}
+                        paginationModel={paginationModel}
+                        onPaginationModelChange={setPaginationModel}
+                        pageSizeOptions={[5, 10, 20]}
+                        pagination
+                        onRowClick={handleRowClick}
+                        loading={loading}
+                    />
+                    {loading && <Loading text="Đang tải dữ liệu..." />}
+                </Paper>
+                <Box
+                    sx={{
+                        position: 'fixed', bottom: 24, right: 24, '& > :not(style)': { m: 1 }, zIndex: 1200,    // luôn nổi trên UI
+                    }}
+                >
+                    <Fab color="secondary" onClick={handleAddChannel} >
+                        <AddCardIcon />
+                    </Fab>
+                </Box>
+            </div >
 
             <ModalChannel
                 isShowModalChannel={isShowModalChannel}

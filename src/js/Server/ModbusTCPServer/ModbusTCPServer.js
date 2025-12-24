@@ -1,6 +1,6 @@
 import {
     useState, useEffect, Paper, Button, Box, ModalSearchChannels, ModalAddTagServer,
-    AddCardIcon, DeleteForeverIcon, Loading, CustomDataGrid, BorderColorIcon, Grid,
+    AddBoxIcon, DeleteForeverIcon, Loading, CustomDataGrid, BorderColorIcon, Grid,
     ModalDelete, toast, socket, PlayCircleOutlineIcon, SyncIcon, StopIcon, Fab
 } from '../../ImportComponents/Imports';
 import {
@@ -161,36 +161,48 @@ const ListTCPServer = () => {
     };
 
     const handleStartTCPServer = () => {
-        socket.emit('START TCP SERVER', (res) => {
-            if (res.success) {
-                toast.success(res.message);
-            } else {
-                toast.error(res.message);
-                console.error(res.error);
-            }
-        });
+        if (listTCPServer.length > 0) {
+            socket.emit('START TCP SERVER', (res) => {
+                if (res.success) {
+                    toast.success(res.message);
+                } else {
+                    toast.error(res.message);
+                    console.error(res.error);
+                }
+            });
+        } else {
+            toast.info('Vui lòng tạo tag để sử dụng');
+        }
     }
 
     const handleStopTCPServer = () => {
-        socket.emit('STOP TCP SERVER', (res) => {
-            if (res.success) {
-                toast.success(res.message);
-            } else {
-                toast.error(res.message);
-                console.error(res.error);
-            }
-        });
+        if (listTCPServer.length > 0) {
+            socket.emit('STOP TCP SERVER', (res) => {
+                if (res.success) {
+                    toast.success(res.message);
+                } else {
+                    toast.error(res.message);
+                    console.error(res.error);
+                }
+            });
+        } else {
+            toast.info('Vui lòng tạo tag để sử dụng');
+        }
     }
 
     const handleReloadTCPServer = () => {
-        socket.emit('RELOAD TCP SERVER', (res) => {
-            if (res.success) {
-                toast.success(res.message);
-            } else {
-                toast.error(res.message);
-                console.error(res.error);
-            }
-        });
+        if (listTCPServer.length > 0) {
+            socket.emit('RELOAD TCP SERVER', (res) => {
+                if (res.success) {
+                    toast.success(res.message);
+                } else {
+                    toast.error(res.message);
+                    console.error(res.error);
+                }
+            });
+        } else {
+            toast.info('Vui lòng tạo tag để sử dụng');
+        }
     }
 
     const conformDeleteTCPServer = async () => {
@@ -268,7 +280,7 @@ const ListTCPServer = () => {
 
     return (
         <div>
-            {listTCPServer.length > 0 && (
+            {listTCPServer.length >= 0 && (
                 <Grid
                     container
                     columnSpacing={55}
@@ -317,17 +329,17 @@ const ListTCPServer = () => {
 
             )}
 
-            {selectedCount > 1 && (
+            <Box sx={{ height: 30, display: 'flex', alignItems: 'center', pb: 2 }}  >
                 <Button
                     variant="contained"
                     color="error"
                     startIcon={<DeleteForeverIcon />}
                     onClick={(e) => { e.stopPropagation(); handleDeleteTCPServer(); }}
-                    sx={{ mb: 1.5, ml: 0.3, textTransform: 'none' }}
+                    sx={{ textTransform: 'none', visibility: selectedCount > 1 ? 'visible' : 'hidden', }}
                 >
-                    Xóa Nhiều
+                    Xóa nhiều
                 </Button>
-            )}
+            </Box>
 
             <Paper sx={{ height: 400, width: '100%' }}>
                 <CustomDataGrid
@@ -354,8 +366,8 @@ const ListTCPServer = () => {
                     position: 'fixed', bottom: 24, right: 24, '& > :not(style)': { m: 1 }, zIndex: 1200,    // luôn nổi trên UI
                 }}
             >
-                <Fab color="secondary" onClick={handleOpenModalAdd} >
-                    <AddCardIcon />
+                <Fab color="success" onClick={handleOpenModalAdd} >
+                    <AddBoxIcon />
                 </Fab>
             </Box>
 

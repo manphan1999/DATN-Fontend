@@ -52,20 +52,20 @@ const ServerTab = () => {
                         variant="fullWidth"
                         sx={{ width: '100%' }}
                     >
-                        <Tab sx={{ textTransform: 'none', fontWeight: 'bold', fontSize: 15, whiteSpace: 'nowrap' }} label="Publish MQTT" />
                         <Tab sx={{ textTransform: 'none', fontWeight: 'bold', fontSize: 15, whiteSpace: 'nowrap' }} label="Modbus RTU Server" />
                         <Tab sx={{ textTransform: 'none', fontWeight: 'bold', fontSize: 15, whiteSpace: 'nowrap' }} label="Modbus TCP Server" />
+                        <Tab sx={{ textTransform: 'none', fontWeight: 'bold', fontSize: 15, whiteSpace: 'nowrap' }} label="Publish MQTT" />
                     </Tabs>
                 </Box>
             </Paper>
 
-            <TabPanel value={tabValue} index={0}>
+            <TabPanel value={tabValue} index={2}>
                 <ListPublishMqtt />
             </TabPanel>
-            <TabPanel value={tabValue} index={1}>
+            <TabPanel value={tabValue} index={0}>
                 <ModbusRTUServer />
             </TabPanel>
-            <TabPanel value={tabValue} index={2}>
+            <TabPanel value={tabValue} index={1}>
                 <ModbusTCPServer />
             </TabPanel>
 

@@ -1,6 +1,6 @@
 import {
     useState, useEffect, _, Typography, Checkbox, Paper, Button, BorderColorIcon,
-    AddCardIcon, DeleteForeverIcon, Box, toast, SettingsApplicationsIcon, Loading,
+    NoteAddIcon, DeleteForeverIcon, Box, toast, SettingsApplicationsIcon, Loading,
     ModalSearchChannels, ModalDelete, CustomDataGrid, ModalAddTagAlarm, ModalConfigAlarm,
     ModalEditApp, socket, InfoOutlinedIcon, WarningAmberIcon, ErrorIcon, Fab
 } from '../../../ImportComponents/Imports';
@@ -228,19 +228,19 @@ const ListAlarm = () => {
 
     return (
         <div>
-            {selectedCount > 1 && (
+            <Box sx={{ height: 30, display: 'flex', alignItems: 'center', pb: 2 }}  >
                 <Button
                     variant="contained"
                     color="error"
                     startIcon={<DeleteForeverIcon />}
                     onClick={(e) => { e.stopPropagation(); handleDeleteTagAlarm(); }}
-                    sx={{ mb: 1.5, mx: 1.5, textTransform: 'none' }}
+                    sx={{ textTransform: 'none', visibility: selectedCount > 1 ? 'visible' : 'hidden', }}
                 >
-                    Xóa Tags
+                    Xóa nhiều
                 </Button>
-            )}
+            </Box>
 
-            <Paper sx={{ height: 400, width: '100%' }}>
+            <Paper sx={{ height: 371, width: '100%' }}>
                 <CustomDataGrid
                     rows={listAlarm}
                     columns={columns}
@@ -256,7 +256,6 @@ const ListAlarm = () => {
 
                     loading={loading}
                 />
-
                 {loading && <Loading text="Đang tải dữ liệu..." />}
             </Paper>
 
@@ -269,8 +268,8 @@ const ListAlarm = () => {
                     <SettingsApplicationsIcon />
                 </Fab>
 
-                <Fab color="secondary" onClick={handleopenModalAddAlarm} >
-                    <AddCardIcon />
+                <Fab color="success" onClick={handleopenModalAddAlarm} >
+                    <NoteAddIcon />
                 </Fab>
             </Box>
 

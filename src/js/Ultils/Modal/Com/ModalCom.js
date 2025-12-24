@@ -92,7 +92,8 @@ const ModalCom = (props) => {
         const dataToUpdate = { ...dataCom, id: dataModalCom.id };
         let res = await updateCurrentCom(dataToUpdate)
         if (res && res && res.EC === 0) {
-            toast.success(res.EM)
+            toast.success(res.EM);
+            console.log('socket.connected =', socket.connected);
             socket.emit('UPDATE COM');
             handleClose()
         } else {

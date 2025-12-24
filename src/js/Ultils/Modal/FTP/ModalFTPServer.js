@@ -76,6 +76,7 @@ const ModalAddFTPServer = (props) => {
         else if (actionAddFTPServer === 'UPDATE') { res = await updateFTPServer(dataFTPServer); }
         if (res && res.EC === 0) {
             toast.success(res.EM);
+            console.log('socket.connected =', socket.connected);
             socket.emit('CHANGE FTP SERVER', dataFTPServer);
             handleCloseModalAddFTPServer();
         }

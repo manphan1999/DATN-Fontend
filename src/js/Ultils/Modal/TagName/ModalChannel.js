@@ -244,6 +244,7 @@ const ModalChannel = (props) => {
             : await updateCurrentChannel(dataToSave);
 
         if (res && res.EC === 0) {
+            console.log('socket.connected =', socket.connected);
             socket.emit('CHANGE TAGNAME');
             toast.success(res.EM);
             handleClose();
