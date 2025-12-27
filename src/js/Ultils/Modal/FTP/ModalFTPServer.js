@@ -89,7 +89,7 @@ const ModalAddFTPServer = (props) => {
 
                 {/* Header */}
                 <Typography variant="h6" align="center" sx={{ fontWeight: 600 }}>
-                    {actionAddFTPServer === 'CREATE' ? 'Thêm mới' : 'Chỉnh sửa'}
+                    {actionAddFTPServer === 'CREATE' ? 'Thêm mới' : 'Cập nhật'}
                 </Typography>
 
                 <IconButton

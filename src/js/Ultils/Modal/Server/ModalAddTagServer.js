@@ -154,7 +154,7 @@ const ModalAddTagServer = (props) => {
             <Box sx={style}>
                 {/* Header */}
                 <Typography variant="h6" align="center" sx={{ mb: 1, fontWeight: 600, }}  >
-                    {(action === 'CREATE RTU' || action === 'CREATE TCP') ? 'Thêm mới' : 'Chỉnh sửa'}
+                    {(action === 'CREATE RTU' || action === 'CREATE TCP') ? 'Thêm mới' : 'Cập nhật'}
                 </Typography>
 
                 <IconButton
@@ -259,11 +259,11 @@ const ModalAddTagServer = (props) => {
                         value={dataServer.dataFormat ?? ""}
                         variant="standard"
                         // onChange={(e) => handleOnchangeInput(e.target.value, 'dataFormat')}
-                        sx={(action === 'CREATE RTU' || action === 'UPDATE RTU') && Number(dataModalServer.dataFormat) < 2 ? {
-                            gridColumn: 'span 2',
-                            justifySelf: 'center',
-                            width: '50%'
-                        } : {}}
+                        // sx={(action === 'CREATE RTU' || action === 'UPDATE RTU') && Number(dataModalServer.dataFormat) < 2 ? {
+                        //     gridColumn: 'span 2',
+                        //     justifySelf: 'center',
+                        //     width: '50%'
+                        // } : {}}
                         error={!!errors.dataFormat}
                         helperText={errors.dataFormat}
                     >

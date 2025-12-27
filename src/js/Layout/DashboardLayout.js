@@ -50,10 +50,12 @@ const DashboardLayout = () => {
     }, [currentPage]);
 
     useEffect(() => {
-        socket.connect(); // kết nối khi trang mở
-        socket.on("SERVER SEND HOME DATA", () => {
+        socket.on("UPDATE HEADER", () => {
             fetchContentHeader();
         });
+        return () => {
+            socket.off("UPDATE HEADER");
+        };
     }, []);
 
     useEffect(() => {

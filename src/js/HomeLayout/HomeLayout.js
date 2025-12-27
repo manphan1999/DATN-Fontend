@@ -107,11 +107,10 @@ const HomeLayout = () => {
 
     // Socket realtime
     useEffect(() => {
-        socket.connect(); // kết nối khi trang mở
-
+        // socket.connect(); // kết nối khi trang mở
         socket.on("SERVER SEND HOME DATA", (data) => {
             const mapped = data.map((item, index) => {
-                console.log('status: string_status -> ', item.status)
+                //    console.log('status: string_status -> ', item.status)
                 let string_status;
                 if (item.status === 1) {
                     string_status = "Normal";
@@ -156,7 +155,7 @@ const HomeLayout = () => {
         return () => {
             socket.off("SERVER WRITE RESULT");
             socket.off("SERVER SEND HOME DATA");
-            socket.disconnect();
+            //   socket.disconnect();
         };
     }, []);
 

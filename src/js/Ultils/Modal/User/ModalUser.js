@@ -79,7 +79,7 @@ const ModalUser = (props) => {
 
                 {/* Header */}
                 <Typography variant="h6" align="center" sx={{ fontWeight: 600 }}>
-                    {action === 'CREATE' ? 'Thêm mới' : 'Chỉnh sửa'}
+                    {action === 'CREATE' ? 'Thêm mới' : 'Cập nhật'}
                 </Typography>
 
                 <IconButton

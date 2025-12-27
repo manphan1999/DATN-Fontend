@@ -241,6 +241,22 @@ const deletePublish = (tagdelete) => {
     });
 };
 
+const fetchAllConfigPublish = () => {
+    return axios.get(`/api/v1/publish/get-config`)
+}
+const createConfigPublish = (tagNew) => {
+    return axios.post(`/api/v1/publish/create-config`, tagNew)
+}
+const updateConfigPublish = (tagedit) => {
+    return axios.put(`/api/v1/publish/update-config`, tagedit)
+}
+
+const deleteConfigPublish = (tagdelete) => {
+    return axios.delete(`/api/v1/publish/delete-config`, {
+        data: tagdelete
+    });
+};
+
 /* API RTU Server */
 const fetchAllRTUServer = () => {
     return axios.get(`/api/v1/server/get-rtu`)
@@ -347,6 +363,7 @@ export {
     testMySQLServer, createTableMySQL, testSQLServer, createTableSQL,
     fetchAllSQLServer, createSQLServer, updateSQLServer, deleteSQLServer,
     fetchServer, fetchAllPublish, createPublish, updatePublish, deletePublish,
+    fetchAllConfigPublish, createConfigPublish, updateConfigPublish, deleteConfigPublish,
     fetchAllRTUServer, createRTUServer, updateRTUServer, deleteRTUServer,
     fetchAllTCPServer, createTCPServer, updateTCPServer, deleteTCPServer,
     fetchAllUser, createUser, updateUser, deleteUser, handleLoginWeb,

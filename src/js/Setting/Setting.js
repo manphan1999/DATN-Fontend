@@ -100,7 +100,7 @@ const ListSetting = () => {
 
     const handleReboot = async () => {
         const res = await rebootDevice();
-        if (res && res.DT.EC === 0) { toast.success(res.EM); }
+        if (res && res.DT.EC === 0) { toast.success(res.EM); handleCloseModalSetting(); }
         else { toast.error(res.EM); }
     }
 
@@ -151,6 +151,8 @@ const ListSetting = () => {
     }
 
     const handleOpenModalSetting = (action) => {
+        setEnableConfigNetwork(false);
+        setEnableConfigHeader(false);
         SetIsShowModalSetting(true);
     }
 
@@ -267,7 +269,7 @@ const ListSetting = () => {
                                     handleConfigNetwork();
                                 }}
                             >
-                                {(!enableConfigNetwork) ? 'Chỉnh sửa' : 'Thoát'}
+                                {(!enableConfigNetwork) ? 'Cập nhật' : 'Thoát'}
                             </Button>
 
                             <Button
@@ -323,7 +325,7 @@ const ListSetting = () => {
                                 handleConfigHeader();
                             }}
                         >
-                            {(!enableConfigHeader) ? 'Chỉnh sửa' : 'Thoát'}
+                            {(!enableConfigHeader) ? 'Cập nhật' : 'Thoát'}
                         </Button>
                         <Button
                             variant="contained"

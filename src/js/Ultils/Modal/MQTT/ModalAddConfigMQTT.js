@@ -3,9 +3,10 @@ import {
     Box, Modal, Typography, CancelIcon, socket, SaveIcon,
     CancelPresentation, AddBoxIcon, toast, _, Checkbox, useValidator,
 } from '../../../ImportComponents/Imports';
-import { createPublish, updatePublish, fetchAllChannels } from '../../../../Services/APIDevice';
 
-const ModalAddTagPublish = (props) => {
+import { createConfigPublish, updateConfigPublish, fetchAllDevices } from '../../../../Services/APIDevice';
+
+const ModalAddConfigMQTT = (props) => {
     const style = {
         position: 'absolute',
         top: '50%',
@@ -21,75 +22,78 @@ const ModalAddTagPublish = (props) => {
     };
 
     const defaultData = {
-        tagnameId: '',
-        name: '',
         deviceId: '',
         deviceName: '',
         topic: '',
+        controlQoS: '',
         controlRetain: '',
-        controlQoS: ''
     };
 
     const { validate } = useValidator();
     const [errors, setErrors] = useState({});
     const [dataPublish, setDataPublish] = useState(defaultData);
-    const [listChannels, setListChannels] = useState([]);
+    const [listConfig, SetListConfig] = useState([]);
     const [loading, setLoading] = useState(true);
-    const { action, openModalAddPublish, handleCloseModalAddPublish, dataModalPublish } = props;
+    const { action, openModalAddPublish, handleCloseModalAddConfigMQTT, dataModalConfig } = props;
 
     useEffect(() => {
-        if (action === 'UPDATE' && dataModalPublish) {
+        if (action === 'UPDATE' && dataModalConfig) {
             setDataPublish({
-                ...dataModalPublish,
-                controlQoS: dataModalPublish.controlQoS ?? "0",
-                controlRetain: dataModalPublish.controlRetain ?? false
+                ...dataModalConfig,
+                controlQoS: String(dataModalConfig.controlQoS ?? '0'),
+                controlRetain: String(dataModalConfig.controlRetain ?? 'false'),
             });
             setErrors({});
         } else {
             setDataPublish(defaultData);
-            fetchChannel();
+            fetchDevices();
         }
-    }, [action, dataModalPublish, openModalAddPublish]);
+    }, [action, dataModalConfig, openModalAddPublish]);
 
-    const fetchChannel = async () => {
+    const fetchDevices = async () => {
         setLoading(true);
-        let response = await fetchAllChannels();
+        const response = await fetchAllDevices();
 
-        if (response && response.EC === 0 && Array.isArray(response.DT?.DT)) {
-            const rowsWithId = response.DT.DT.map(item => ({
-                id: item._id,
-                channel: item.channel,
-                name: item.name,
-                deviceId: item.device?._id,
-                deviceName: item.device?.name,
-            }));
-            setListChannels(rowsWithId);
+        if (response?.EC === 0 && Array.isArray(response.DT?.DT)) {
+            const mqttDevices = response.DT.DT
+                .filter(item => item.protocol === 'MQTT')
+                .map(item => ({
+                    id: item._id,
+                    name: item.name,
+                    ipAddress: item.ipAddress,
+                    port: item.port,
+                    protocol: item.protocol,
+                    driverName: item.driverName,
+                    username: item.username,
+                    password: item.password,
+                }));
+            // console.log('DEVICES:', mqttDevices);
+            SetListConfig(mqttDevices);
         }
-
         setLoading(false);
     };
 
-
     const validateAll = () => {
         const newErrors = {};
-        // Chỉ validate các trường bắt buộc
-        const fieldsToValidate = ["name", "topic", "controlQoS", "controlRetain"];
-        fieldsToValidate.forEach((key) => {
-            const value = dataPublish[key];
-            const errorMsg = validate(key, value);
-            newErrors[key] = errorMsg;
-            if (errorMsg) {
-                console.warn(`Lỗi ở ${key}: ${errorMsg}`);
-            }
-        });
+        const fields = [
+            'deviceId',
+            'topic',
+            'controlQoS',
+            'controlRetain',
+        ];
 
+        fields.forEach(key => {
+            const value = dataPublish[key];
+            const error = validate(key, value);
+            newErrors[key] = error;
+        });
         setErrors(newErrors);
-        // Trả về true nếu không có lỗi
-        return Object.values(newErrors).every(err => err === "");
+        const isValid = Object.values(newErrors).every(e => !e);
+        return isValid;
     };
 
     const handleClose = () => {
-        handleCloseModalAddPublish();
+        handleCloseModalAddConfigMQTT();
         setErrors({})
         setDataPublish(defaultData);
     };
@@ -111,41 +115,34 @@ const ModalAddTagPublish = (props) => {
         }));
     };
 
-    const handleSelectChannel = (item) => {
+    const handleSelectDevice = (device) => {
+        if (!device) return;
+
         setDataPublish(prev => ({
             ...prev,
-            channel: item.channel,
-            name: item.name,
-            tagnameId: item.id,
-            deviceId: item.deviceId,
-            deviceName: item.deviceName
+            deviceId: device.id,
+            deviceName: device.name,
+            ipAddress: device.ipAddress,
+            port: device.port,
+            protocol: device.protocol,
+            driverName: device.driverName,
+            username: device.username,
+            password: device.password,
         }));
 
-        const errorMessage = validate("name", item.name);
         setErrors(prev => ({
             ...prev,
-            name: errorMessage,
-        }));
-    };
-
-    const handleCheckboxChange = (label) => {
-        setDataPublish((prev) => ({
-            ...prev,
-            selection: {
-                ...prev.selection,
-                [label]: !prev.selection?.[label]
-            }
+            deviceId: validate('deviceId', device.id),
         }));
     };
 
     const handleConfirmPublish = async () => {
         if (!validateAll()) return;
-
         let res;
         if (action === 'CREATE') {
-            res = await createPublish(dataPublish);
+            res = await createConfigPublish(dataPublish);
         } else {
-            res = await updatePublish(dataPublish);
+            res = await updateConfigPublish(dataPublish);
         }
         if (res && res.EC === 0) {
             console.log('socket.connected =', socket.connected);
@@ -163,7 +160,7 @@ const ModalAddTagPublish = (props) => {
             <Box sx={style}>
                 {/* Header */}
                 <Typography variant="h6" align="center" sx={{ fontWeight: 600, }}  >
-                    {action === 'CREATE' ? 'Thêm mới' : 'Chỉnh sửa'}
+                    {action === 'CREATE' ? 'Thêm mới' : 'Cập nhật'}
                 </Typography>
 
                 <IconButton
@@ -192,19 +189,19 @@ const ModalAddTagPublish = (props) => {
                 >
                     {/* Name */}
                     <TextField
-                        label="Name"
+                        label="MQTT Device"
                         select
                         fullWidth
                         variant="standard"
-                        value={dataPublish.tagnameId}
+                        value={dataPublish.deviceId}
                         onChange={(e) => {
-                            const selected = listChannels.find(ch => ch.id === e.target.value);
-                            handleSelectChannel(selected);
+                            const selected = listConfig.find(d => d.id === e.target.value);
+                            handleSelectDevice(selected);
                         }}
-                        error={!!errors.name}
-                        helperText={errors.name}
+                        error={!!errors.deviceId}
+                        helperText={errors.deviceId}
                     >
-                        {listChannels.map(item => (
+                        {listConfig.map(item => (
                             <MenuItem key={item.id} value={item.id}>
                                 {item.name}
                             </MenuItem>
@@ -271,6 +268,7 @@ const ModalAddTagPublish = (props) => {
                             startIcon={action === 'CREATE' ? <AddBoxIcon /> : <SaveIcon />}
                             sx={{ ml: 1.5, textTransform: 'none' }}
                             type="submit"
+
                         >
                             {action === 'CREATE' ? 'Thêm' : 'Cập nhật'}
                         </Button>
@@ -283,4 +281,4 @@ const ModalAddTagPublish = (props) => {
     );
 }
 
-export default ModalAddTagPublish;
+export default ModalAddConfigMQTT;

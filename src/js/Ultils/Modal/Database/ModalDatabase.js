@@ -41,6 +41,7 @@ const ModalDatabase = (props) => {
     const { validate } = useValidator();
     const [errors, setErrors] = useState({});
     const [showPassword, setShowPassword] = useState(false);
+    const [enableAdd, setEnableAdd] = useState(true);
     const [dataDatabase, setDataDatabase] = useState(defaultData);
 
     useEffect(() => {
@@ -89,7 +90,9 @@ const ModalDatabase = (props) => {
         }
         if (res && res.EC === 0) {
             toast.success(res.EM);
+            setEnableAdd(false);
         } else {
+            setEnableAdd(true);
             const detail = res.DT?.DT ? `: ${res.DT.DT}` : '';
             toast.error(res.EM + detail);
         }
@@ -117,7 +120,7 @@ const ModalDatabase = (props) => {
 
                 {/* Header */}
                 <Typography variant="h6" align="center" sx={{ fontWeight: 600 }}>
-                    {actionAddDatabase === 'CREATE MYSQL' || actionAddDatabase === 'CREATE SQL' ? 'Thêm mới' : 'Chỉnh sửa'}
+                    {actionAddDatabase === 'CREATE MYSQL' || actionAddDatabase === 'CREATE SQL' ? 'Thêm mới' : 'Cập nhật'}
                 </Typography>
 
                 <IconButton
@@ -234,6 +237,7 @@ const ModalDatabase = (props) => {
                                         ? <AddBoxIcon />
                                         : <SaveIcon />
                                 }
+                                disabled={enableAdd}
                                 sx={{ ml: 1.5, textTransform: 'none' }}
                                 type="submit"
                             >

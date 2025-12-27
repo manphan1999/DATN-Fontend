@@ -99,7 +99,7 @@ const ModalEditApp = (props) => {
             <Box sx={style}>
                 {/* Header */}
                 <Typography variant="h6" align="center" sx={{ fontWeight: 600 }}>
-                    Chỉnh sửa
+                    Cập nhật
                 </Typography>
 
                 <IconButton

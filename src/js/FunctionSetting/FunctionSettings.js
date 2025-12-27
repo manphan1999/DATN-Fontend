@@ -37,11 +37,9 @@ const FunctionSettings = (props) => {
     const [selectedRow, setSelectedRow] = useState(null);
 
     useEffect(() => {
-        socket.connect(); // kết nối khi trang mở
-
         socket.on("SERVER SEND HOME DATA", (data) => {
             const mapped = data.map((item, index) => {
-                console.log('status: string_status -> ', item.status)
+                //     console.log('status: string_status -> ', item.status)
                 let string_status;
                 if (item.status === 1) {
                     string_status = "Normal";
@@ -84,7 +82,7 @@ const FunctionSettings = (props) => {
         return () => {
             socket.off("SERVER WRITE RESULT");
             socket.off("SERVER SEND HOME DATA");
-            socket.disconnect(); // ngắt kết nối khi rời trang
+            //socket.disconnect(); // ngắt kết nối khi rời trang
         };
     }, []);
 

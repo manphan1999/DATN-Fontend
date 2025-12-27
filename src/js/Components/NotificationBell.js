@@ -1,17 +1,53 @@
 import {
     useEffect, useMemo, useState, Badge, Box, Divider, IconButton, List, ListItem,
     ListItemIcon, ListItemText, Menu, Tooltip, Typography, Button, NotificationsNoneIcon,
-    ErrorOutlineIcon, WarningAmberIcon
+    ErrorOutlineIcon, WarningAmberIcon, socket, InfoOutlinedIcon,
 } from '../ImportComponents/Imports';
 
-import { getAll, markAllRead, clearAll } from './notificationsBus';
+import { pushNotify, getAll, markAllRead, clearAll } from './notificationStore'
 
-export default function NotificationBell() {
+const NotificationBell = () => {
     const [anchorEl, setAnchorEl] = useState(null);
     const [items, setItems] = useState(() => getAll());
     const open = Boolean(anchorEl);
+    const TYPE_CONFIG = {
+        Info: {
+            Icon: InfoOutlinedIcon,
+            color: 'primary.main'
+        },
+        Warning: {
+            Icon: WarningAmberIcon,
+            color: 'warning.main'
+        },
+        Error: {
+            Icon: ErrorOutlineIcon,
+            color: 'error.main'
+        }
+    };
 
-    const unread = useMemo(() => items.filter((i) => !i.read).length, [items]);
+    const unread = useMemo(
+        () => items.filter(i => !i.read).length,
+        [items]
+    );
+
+    useEffect(() => {
+        //console.log('NotificationBell mounted');
+
+        const handler = (data) => {
+            //   console.log('notify received', data);
+            pushNotify({
+                id: data.id || Date.now(),
+                type: data.type,
+                message: data.message,
+                time: data.time || new Date().toISOString()
+            });
+        };
+        socket.on('notify', handler);
+        return () => {
+            //  console.log('NotificationBell unmounted');
+            socket.off('notify', handler);
+        };
+    }, []);
 
     useEffect(() => {
         const onUpdate = () => setItems(getAll());
@@ -20,7 +56,7 @@ export default function NotificationBell() {
         return () => window.removeEventListener('app:notify:update', onUpdate);
     }, []);
 
-    const handleOpen = (e) => setAnchorEl(e.currentTarget);
+    const handleOpen = (e) => { setAnchorEl(e.currentTarget); }
     const handleClose = () => setAnchorEl(null);
 
     const handleMarkAll = () => markAllRead();
@@ -62,20 +98,32 @@ export default function NotificationBell() {
                         </ListItem>
                     ) : (
                         items.map((it) => {
-                            const Icon = it.type === 'error' ? ErrorOutlineIcon : WarningAmberIcon;
+                            const cfg = TYPE_CONFIG[it.type] || TYPE_CONFIG.Warning;
+                            const Icon = cfg.Icon;
                             const time = new Date(it.time).toLocaleString();
+
                             return (
                                 <ListItem key={it.id} sx={{ opacity: it.read ? 0.7 : 1, py: 1 }}>
-                                    <ListItemIcon sx={{ minWidth: 36, color: it.type === 'error' ? 'error.main' : 'warning.main' }}>
+                                    <ListItemIcon sx={{ minWidth: 36, color: cfg.color }}>
                                         <Icon fontSize="small" />
                                     </ListItemIcon>
+
                                     <ListItemText
-                                        primary={<Typography variant="body2" sx={{ fontWeight: 600 }}>{it.message}</Typography>}
-                                        secondary={<Typography variant="caption" color="text.secondary">{time}</Typography>}
+                                        primary={
+                                            <Typography variant="body2" sx={{ fontWeight: 600 }}>
+                                                {it.message}
+                                            </Typography>
+                                        }
+                                        secondary={
+                                            <Typography variant="caption" color="text.secondary">
+                                                {time}
+                                            </Typography>
+                                        }
                                     />
                                 </ListItem>
                             );
                         })
+
                     )}
                 </List>
 
@@ -93,3 +141,5 @@ export default function NotificationBell() {
         </>
     );
 }
+
+export default NotificationBell;

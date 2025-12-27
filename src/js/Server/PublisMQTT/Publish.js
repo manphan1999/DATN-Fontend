@@ -1,90 +1,104 @@
 import {
-    useState, useEffect, Paper, Button, Box, ModalSearchChannels, ModalDelete, ModalAddTagPublish,
+    useState, useEffect, Paper, Button, Box, ModalSearchChannels, ModalDelete, ModalAddConfigMQTT,
     AddBoxIcon, DeleteForeverIcon, Loading, CustomDataGrid, toast, BorderColorIcon, socket,
-    PlayCircleOutlineIcon, StopIcon, SyncIcon, Fab, Grid
+    PlayCircleOutlineIcon, StopIcon, SyncIcon, Fab, Grid, ModalConfigMQTT, SettingsApplicationsIcon
 } from '../../ImportComponents/Imports';
-import { fetchAllPublish, deletePublish, fetchAllDevices } from '../../../Services/APIDevice';
+import { fetchAllPublish, deletePublish, deleteConfigPublish } from '../../../Services/APIDevice';
 
 const ListPublishMqtt = () => {
-    const [action, setAction] = useState([]);
+    const [actionConfig, setActionConfig] = useState([]);
+    const [actionAdd, setActionAdd] = useState([]);
     const [actionPublishMqtt, setActionPublishMqtt] = useState([]);
-    const [actionDeletePublish, setActionDeletePublish] = useState([]);
-    const [openModalAddTagPublish, setOpenModalAdd] = useState(false);
-
+    const [actionDelete, setActionDelete] = useState([]);
+    const [openModalAddTag, setOpenModalAddTag] = useState(false);
+    const [openModalAddConfigMQTT, setOpenModalAddConfigMQTT] = useState(false);
+    const [openModalConfig, setOpenModalConfig] = useState(false);
     const [isShowModalDelete, setIsShowModalDelete] = useState(false);
+    const [reloadDataConfig, setReloadDataConfig] = useState(false);
     const [dataModalDelete, setDataModalDelete] = useState([]);
     const [selectedCount, setSelectedCount] = useState(0);
 
     const [paginationModel, setPaginationModel] = useState({ page: 0, pageSize: 5, });
     const [loading, setLoading] = useState(true);
     const [listPublishMqtt, setListPublishMqtt] = useState([]);
-    const [dataEdit, setDataEdit] = useState([]);
+    const [dataEditConfig, setDataEditConfig] = useState([]);
     const [selectedRows, setSelectedRows] = useState([]);
 
-    useEffect(() => {
-        fetchPublish();
-    }, []);
-
-    const fetchPublish = async () => {
-        setLoading(true);
-        let response = await fetchAllPublish();
-        if (response && response.EC === 0 && Array.isArray(response.DT?.DT)) {
-            const rowsWithId = response.DT.DT.map((item) => ({
-                id: item._id,
-                tagnameId: item.tagnameId,
-                channel: item.channel,
-                name: item.name,
-                deviceId: item.deviceId,
-                deviceName: item.deviceName,
-                controlRetain: item.controlRetain,
-                controlQoS: item.controlQoS,
-                topic: item.topic,
-            }));
-            setListPublishMqtt(rowsWithId);
-        }
-        setLoading(false);
-        setSelectedCount(0);
-    };
-
-    const handleOpenModalAdd = () => {
-        setAction('CREATE');
-        setOpenModalAdd(true);
+    const handleOpenModalAddConfig = () => {
+        setActionConfig('CREATE');
+        setReloadDataConfig(false);
+        setOpenModalAddConfigMQTT(true);
     }
 
-    const handleOpenModalEdit = (row) => {
-        setAction('UPDATE');
-        setOpenModalAdd(true);
-        setDataEdit(row);
+    const handleOpenModalEditConfig = (row) => {
+        setActionConfig('UPDATE');
+        setReloadDataConfig(false);
+        setOpenModalAddConfigMQTT(true);
+        setDataEditConfig(row);
     }
 
-    const handleCloseModalAddPublish = () => { setOpenModalAdd(false); fetchPublish(); }
+    const handleOpenModalAddTag = () => {
+        setActionAdd('MQTT');
+        setOpenModalAddTag(true);
+    }
 
+    const handleCloseModalAddTag = () => { setOpenModalAddTag(false); }
+    const handleCloseModalAddConfigMQTT = () => { setOpenModalAddConfigMQTT(false); setReloadDataConfig(true); }
     const handleCloseModalDelete = () => { setIsShowModalDelete(false); }
 
-    const handleDeletePublish = (PublishMqtt) => {
+    const handleOpenModalConfig = () => {
+        setOpenModalConfig(true);
+    }
+    const handleCloseModalConfig = () => { setOpenModalConfig(false); setReloadDataConfig(false); }
+
+    // const handleDeletePublish = (PublishMqtt) => {
+    //     let dataToDelete = [];
+    //     if (PublishMqtt) {
+    //         dataToDelete = [{ id: PublishMqtt.id }];
+    //         setSelectedCount(1);
+    //     } else {
+    //         dataToDelete = listPublishMqtt
+    //             .filter(item => selectedRows.includes(item.id))
+    //             .map(item => ({ id: item.id }));
+    //         setSelectedCount(dataToDelete.length);
+    //     }
+    //     setDataModalDelete(dataToDelete);
+    //     setIsShowModalDelete(true);
+    //     setActionDelete('MQTT');
+    // };
+
+    // const conformDeletePublish = async () => {
+    //     let res = await deletePublish({ list: dataModalDelete });
+    //     let serverData = res;
+
+    //     if (+serverData.EC === 0) {
+    //         toast.success(serverData.EM);
+    //         setIsShowModalDelete(false);
+    //     } else {
+    //         toast.error(serverData.EM);
+    //     }
+    // };
+
+    const handleDeleteConfig = (config) => {
+        setReloadDataConfig(false);
         let dataToDelete = [];
-        if (PublishMqtt) {
-            dataToDelete = [{ id: PublishMqtt.id }];
+        if (config) {
+            dataToDelete = [{ id: config.id }];
             setSelectedCount(1);
-        } else {
-            dataToDelete = listPublishMqtt
-                .filter(item => selectedRows.includes(item.id))
-                .map(item => ({ id: item.id }));
-            setSelectedCount(dataToDelete.length);
         }
         setDataModalDelete(dataToDelete);
         setIsShowModalDelete(true);
-        setActionDeletePublish('MQTT');
+        setActionDelete('CONFIG MQTT');
     };
 
-    const conformDeletePublish = async () => {
-        let res = await deletePublish({ list: dataModalDelete });
+    const conformDeleteConfig = async () => {
+        let res = await deleteConfigPublish({ list: dataModalDelete });
         let serverData = res;
 
         if (+serverData.EC === 0) {
             toast.success(serverData.EM);
             setIsShowModalDelete(false);
-            fetchPublish();
+            setReloadDataConfig(true);
         } else {
             toast.error(serverData.EM);
         }
@@ -124,8 +138,6 @@ const ListPublishMqtt = () => {
     }
 
     const columns = [
-        { field: 'channel', headerName: 'Channel', flex: 1, align: 'center', headerAlign: 'center' },
-        { field: 'name', headerName: 'Name', flex: 1, align: 'center', headerAlign: 'center' },
         { field: 'deviceName', headerName: 'Device', flex: 1, align: 'center', headerAlign: 'center' },
         { field: 'topic', headerName: 'Topic', flex: 1, align: 'center', headerAlign: 'center' },
         { field: 'controlQoS', headerName: 'QoS', flex: 1, align: 'center', headerAlign: 'center' },
@@ -143,7 +155,7 @@ const ListPublishMqtt = () => {
                             color="primary"
                             startIcon={<BorderColorIcon />}
                             sx={{ textTransform: 'none', minWidth: 80 }}
-                            onClick={(e) => { e.stopPropagation(); handleOpenModalEdit(params.row); }}
+                        // onClick={(e) => { e.stopPropagation(); handleOpenModalEditConfig(params.row); }}
                         >
                             Sửa
                         </Button>
@@ -152,7 +164,7 @@ const ListPublishMqtt = () => {
                             color="error"
                             startIcon={<DeleteForeverIcon />}
                             sx={{ textTransform: 'none', minWidth: 80 }}
-                            onClick={(e) => { e.stopPropagation(); handleDeletePublish(params.row); }}
+                        //    onClick={(e) => { e.stopPropagation(); handleDeletePublish(params.row); }}
                         >
                             Xóa
                         </Button>
@@ -218,7 +230,7 @@ const ListPublishMqtt = () => {
                     variant="contained"
                     color="error"
                     startIcon={<DeleteForeverIcon />}
-                    onClick={(e) => { e.stopPropagation(); handleDeletePublish(); }}
+                    // onClick={(e) => { e.stopPropagation(); handleDeletePublish(); }}
                     sx={{ textTransform: 'none', visibility: selectedCount > 1 ? 'visible' : 'hidden', }}
                 >
                     Xóa nhiều
@@ -250,21 +262,36 @@ const ListPublishMqtt = () => {
                     position: 'fixed', bottom: 24, right: 24, '& > :not(style)': { m: 1 }, zIndex: 1200,    // luôn nổi trên UI
                 }}
             >
-                <Fab color="success" onClick={handleOpenModalAdd} >
+                <Fab color="primary" onClick={handleOpenModalConfig} >
+                    <SettingsApplicationsIcon />
+                </Fab>
+                <Fab color="success" onClick={handleOpenModalAddTag} >
                     <AddBoxIcon />
                 </Fab>
             </Box>
 
             {/* Modal thêm mới */}
-            <ModalAddTagPublish
-                action={action}
-                openModalAddPublish={openModalAddTagPublish}
-                handleCloseModalAddPublish={handleCloseModalAddPublish}
-                dataModalPublish={dataEdit}
+            <ModalAddConfigMQTT
+                action={actionConfig}
+                openModalAddPublish={openModalAddConfigMQTT}
+                handleCloseModalAddConfigMQTT={handleCloseModalAddConfigMQTT}
+                dataModalConfig={dataEditConfig}
+                setReloadDataConfig={setReloadDataConfig}
+            />
+
+            <ModalConfigMQTT
+                openModalConfig={openModalConfig}
+                reloadDataConfig={reloadDataConfig}
+                handleCloseModalConfig={handleCloseModalConfig}
+                handleOpenModalAddConfig={handleOpenModalAddConfig}
+                handleDeleteConfig={handleDeleteConfig}
+                handleOpenModalEditConfig={handleOpenModalEditConfig}
             />
 
             <ModalSearchChannels
-
+                action={actionAdd}
+                openModalAdd={openModalAddTag}
+                handleCloseModalAdd={handleCloseModalAddTag}
             />
 
             <ModalDelete
@@ -272,8 +299,8 @@ const ListPublishMqtt = () => {
                 handleCloseModalDelete={handleCloseModalDelete}
                 dataModalDelete={dataModalDelete}
                 selectedCount={selectedCount}
-                action={actionDeletePublish}
-                conformDeletePublish={conformDeletePublish}
+                action={actionDelete}
+                conformDeleteConfig={conformDeleteConfig}
             />
 
         </div>

@@ -125,17 +125,20 @@ const Login = () => {
                     </Typography>
 
                     {/* Introduction */}
+                    <Typography fontWeight={700} sx={{ mb: 1 }}>
+                        Giới thiệu về thiết bị
+                    </Typography >
                     <Typography
                         variant="body1"
                         color="text.secondary"
-                        sx={{ mb: 4 }}
+                        sx={{ mb: 2 }}
                     >
                         Datalogger là thiết bị giám sát và điều khiển thiết bị công nghiệp từ xa thông qua Internet.
                         Hệ thống cho phép thu thập, lưu trữ và truyền dữ liệu thời gian thực, giúp quản lý và vận hành hệ thống hiệu quả.
                     </Typography>
 
                     {/* Features */}
-                    <Box sx={{ display: 'grid', gap: 3 }}>
+                    <Box sx={{ display: 'grid', gap: 2 }}>
                         {/* Feature 1 */}
                         <Box sx={{ display: 'flex', gap: 2 }}>
                             <SensorsOutlinedIcon color="primary" />
@@ -183,7 +186,7 @@ const Login = () => {
                             <NotificationsActiveOutlinedIcon color="primary" />
                             <Box>
                                 <Typography fontWeight={700}>
-                                    Cảnh báo & Thông báo
+                                    Cảnh báo theo thời gian thực
                                 </Typography>
                                 <Typography variant="body2" color="text.secondary">
                                     Gửi cảnh báo khi có sự cố thông qua Telegram, Line
@@ -216,6 +219,7 @@ const Login = () => {
                 xs={12}
                 md={6}
                 sx={{
+                    position: 'relative',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
@@ -223,11 +227,13 @@ const Login = () => {
                     py: { xs: 6, md: 0 },
                 }}
             >
+
                 <Paper
                     elevation={20}
                     sx={{
                         width: '100%',
                         maxWidth: 420,
+                        mt: 5,
                         p: { xs: 3.5, sm: 4 },
                         borderRadius: 4
                     }}
@@ -331,7 +337,7 @@ const Login = () => {
                             variant="contained"
                             disabled={loading}
                             sx={{
-                                mt: 1,
+                                mb: 1,
                                 py: 1.4,
                                 fontWeight: 700,
                                 borderRadius: 3,
@@ -347,11 +353,11 @@ const Login = () => {
                         align="center"
                         variant="caption"
                         color="text.secondary"
-                        sx={{ mt: 3 }}
                     >
                         © 2025 – Đồ án tốt nghiệp | Datalogger IoT
                     </Typography>
                 </Paper>
+
             </Grid>
 
         </Grid>

@@ -102,7 +102,7 @@ const ModalConfig = (props) => {
             <Box sx={style}>
                 {/* Header */}
                 <Typography variant="h6" align="center" sx={{ fontWeight: 600, }}  >
-                    Chỉnh sửa
+                    Cập nhật
                 </Typography>
 
                 <IconButton
@@ -207,7 +207,7 @@ const ModalConfig = (props) => {
                         sx={{ width: '150px' }}
                         onClick={() => handleConfirmCom()}
                     >
-                        <span> Chỉnh Sửa </span>
+                        <span> Cập nhật </span>
                     </Button>
                 </Box> */}
 
@@ -232,7 +232,7 @@ const ModalConfig = (props) => {
                         onClick={() => handleConfirmCom()}
                         disabled={_.isEqual(dataConfig, originalData)}
                     >
-                        Chỉnh Sửa
+                        Cập nhật
                     </Button>
 
                 </Box>

@@ -143,12 +143,15 @@ const ModalAddTagAlarm = (props) => {
 
     return (
         <Modal open={openModalAddAlarm} onClose={handleClose} onKeyDown={(e) => {
-
+            if (e.key === "Enter") {
+                e.preventDefault();
+                handleConfirmAlarm();
+            }
         }}>
             <Box sx={style}>
                 {/* Header */}
                 <Typography variant="h6" align="center" sx={{ fontWeight: 600, }}  >
-                    {action === 'CREATE' ? 'Thêm mới' : 'Chỉnh sửa'}
+                    {action === 'CREATE' ? 'Thêm mới' : 'Cập nhật'}
                 </Typography>
 
                 <IconButton

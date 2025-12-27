@@ -291,7 +291,7 @@ const ModalChannel = (props) => {
             <Box sx={style}>
                 {/* Header */}
                 <Typography variant="h6" align="center" sx={{ fontWeight: 600, fontSize: 25 }}  >
-                    {action === 'CREATE' ? 'Thêm mới' : 'Chỉnh sửa'}
+                    {action === 'CREATE' ? 'Thêm mới' : 'Cập nhật'}
                 </Typography>
 
                 <IconButton

@@ -26,8 +26,12 @@ const ModalSetting = (props) => {
 
     return (
         <Dialog
-            open={isShowModalSetting} onClose={handleCloseModalSetting}
-            // onClose={onClose}
+            open={isShowModalSetting} onClose={handleCloseModalSetting} onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                    e.preventDefault();
+                    handleSetting();
+                }
+            }}
             PaperProps={{
                 sx: {
                     width: 380,              // chỉnh chiều rộng

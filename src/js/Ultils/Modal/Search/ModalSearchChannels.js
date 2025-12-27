@@ -176,6 +176,7 @@ const ModalSearchChannels = (props) => {
             return;
         }
 
+
         const res = await createNewHistorical(selectedData)
         if (res && res.EC === 0) {
             toast.success(res.EM);

@@ -176,7 +176,11 @@ const ModalDevice = (props) => {
         const isS7 = dataDevice.driverName === "S7-1200";
         const isMQTT = dataDevice.driverName === "MQTT Client";
 
-        let fieldsToValidate = ["name", "protocol", "timeOut"];
+        let fieldsToValidate = ["name", "protocol"];
+
+        if (!isMQTT) {
+            fieldsToValidate.push("timeOut");
+        }
 
         if (isMQTT) {
             fieldsToValidate.push("username", "password");
@@ -189,6 +193,7 @@ const ModalDevice = (props) => {
         if (isTCP || isS7 || isMQTT) {
             fieldsToValidate.push("ipAddress", "port");
         }
+
         fieldsToValidate.forEach((key) => {
             const value = dataDevice[key];
             const errorMsg = validate(key, value);
@@ -238,7 +243,7 @@ const ModalDevice = (props) => {
             <Box sx={style}>
                 {/* Header */}
                 <Typography variant="h6" align="center" sx={{ fontWeight: 600, mb: 2 }}  >
-                    {action === 'CREATE' ? 'Thêm mới' : 'Chỉnh sửa'}
+                    {action === 'CREATE' ? 'Thêm mới' : 'Cập nhật'}
                 </Typography>
 
                 <IconButton
@@ -385,6 +390,7 @@ const ModalDevice = (props) => {
                                 onChange={(e) => handleOnchangeInput(e.target.value, 'password')}
                                 error={!!errors.password}
                                 helperText={errors.password}
+                                sx={{ gridColumn: 'span 2', justifySelf: 'center', width: '50%' }}
                                 variant="standard"
                                 InputProps={{
                                     endAdornment: (
@@ -404,20 +410,21 @@ const ModalDevice = (props) => {
                     )}
 
                     {/* Time Out */}
-                    <TextField
-                        label="TimeOut (ms)"
-                        InputProps={{ style: { textAlign: 'center' } }}
-                        value={dataDevice.timeOut}
-                        variant="standard"
-                        onChange={(e) => handleOnchangeInput(e.target.value, 'timeOut')}
-                        error={!!errors.timeOut}
-                        helperText={errors.timeOut}
-                        sx={dataDevice.driverName === 'Modbus RTU Client' ? {
-                            gridColumn: 'span 2',
-                            justifySelf: 'center',
-                            width: '50%'
-                        } : {}}
-                    />
+                    {dataDevice.protocol !== 'MQTT' && (
+                        <TextField
+                            label="TimeOut (ms)"
+                            InputProps={{ style: { textAlign: 'center' } }}
+                            value={dataDevice.timeOut}
+                            variant="standard"
+                            onChange={(e) => handleOnchangeInput(e.target.value, 'timeOut')}
+                            error={!!errors.timeOut}
+                            helperText={errors.timeOut}
+                            sx={dataDevice.driverName === 'Modbus RTU Client' ? {
+                                gridColumn: 'span 2',
+                                justifySelf: 'center',
+                                width: '50%'
+                            } : {}}
+                        />)}
                     {/* Footer */}
                     <Box sx={{ gridColumn: 'span 2', display: 'flex', justifyContent: 'flex-end', mt: 1.5 }}>
 
@@ -440,7 +447,7 @@ const ModalDevice = (props) => {
                             type="submit"
                         // disabled={_.isEqual(dataCom, originalData)}
                         >
-                            {action === 'CREATE' ? 'Thêm' : 'Chỉnh sửa'}
+                            {action === 'CREATE' ? 'Thêm' : 'Cập nhật'}
                         </Button>
 
                     </Box>

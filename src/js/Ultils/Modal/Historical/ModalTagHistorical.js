@@ -102,7 +102,7 @@ const ModalAddHistorical = (props) => {
                         top: "-15px"
                     }}
                 >
-                    Chỉnh sửa
+                    Cập nhật
                 </Typography>
 
                 <IconButton
@@ -189,7 +189,7 @@ const ModalAddHistorical = (props) => {
                         sx={{ width: '150px' }}
                         onClick={() => handleConfirmEdit()}
                     >
-                        <span> Chỉnh Sửa </span>
+                        <span> Cập nhật </span>
                     </Button>
                 </Box>
             </Box>

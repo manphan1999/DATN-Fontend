@@ -107,7 +107,7 @@ const ModalEditConfig = (props) => {
                         top: "-15px"
                     }}
                 >
-                    <span>Chỉnh Sửa</span>
+                    <span>Cập nhật</span>
                 </Typography>
 
                 <IconButton

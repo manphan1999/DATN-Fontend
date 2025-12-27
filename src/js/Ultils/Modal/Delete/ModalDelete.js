@@ -7,7 +7,7 @@ const ModalDelete = (props) => {
     const { action, isShowModalDelete, handleCloseModalDelete, conformDeleteDevice, conformDeleteChannel,
         conformDeleteHistorical, conformDeleteAlarm, conformDeleteFTPServer, confirmDeleteMySQL,
         confirmDeleteSQL, conformDeletePublish, conformDeleteRTUServer, conformDeleteTCPServer,
-        conformDeleteUser, selectedCount } = props
+        conformDeleteUser, conformDeleteConfig, selectedCount } = props
     const handleDelete = () => {
         switch (action) {
             case 'CHANNEL':
@@ -26,6 +26,8 @@ const ModalDelete = (props) => {
                 return confirmDeleteSQL();
             case 'MQTT':
                 return conformDeletePublish();
+            case 'CONFIG MQTT':
+                return conformDeleteConfig();
             case 'RTUSERVER':
                 return conformDeleteRTUServer();
             case 'TCPSERVER':

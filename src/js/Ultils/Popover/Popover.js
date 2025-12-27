@@ -32,7 +32,6 @@ const InputPopover = ({
             setInputValue(defaultValue);
             setErrors({});
         }
-        console.log('open: ', open)
     }, [open, defaultValue]);
 
     const handleInputChange = (value, name) => {
@@ -107,7 +106,20 @@ const InputPopover = ({
                 },
             }}
         >
-            <Box sx={{ p: 2, position: "relative", zIndex: 1 }}>
+            <Box
+                component="form"
+                onSubmit={(e) => {
+                    e.preventDefault();
+                    handleConfirm();
+                }}
+                onKeyDown={(e) => {
+                    if (e.key === 'Escape') {
+                        e.preventDefault();
+                        onClose();
+                    }
+                }}
+                sx={{ p: 2, position: "relative", zIndex: 1 }}
+            >
                 {functionCode === 5 ? (
                     <Box
                         sx={{
@@ -140,6 +152,7 @@ const InputPopover = ({
 
                     <TextField
                         fullWidth
+                        autoFocus
                         label="Enter value"
                         value={inputValue}
                         onChange={(e) => handleInputChange(e.target.value, "popover")}
@@ -153,7 +166,10 @@ const InputPopover = ({
                     <Button variant="outlined" onClick={onClose}>
                         Cancel
                     </Button>
-                    <Button variant="contained" onClick={handleConfirm}>
+                    <Button
+                        variant="contained"
+                        type="submit"
+                    >
                         Confirm
                     </Button>
                 </Box>

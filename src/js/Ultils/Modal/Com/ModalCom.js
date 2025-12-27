@@ -103,10 +103,11 @@ const ModalCom = (props) => {
 
     return (
         <Modal open={isShowModalCom} onClose={handleClose}>
+
             <Box sx={style}>
                 {/* Header */}
                 <Typography variant="h6" align="center" sx={{ fontWeight: 600, }}  >
-                    Chỉnh sửa
+                    Cập nhật
                 </Typography>
 
                 <IconButton
