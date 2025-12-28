@@ -20,11 +20,11 @@ const ModalConfigMQTT = (props) => {
         overflowY: 'auto',
     };
 
-    const defaultData = {
-        name: '',
-        token: '',
-        groupId: '',
-    };
+    // const defaultData = {
+    //     name: '',
+    //     token: '',
+    //     groupId: '',
+    // };
 
     const { openModalConfig, handleCloseModalConfig, handleOpenModalAddConfig, reloadDataConfig,
         handleDeleteConfig, handleOpenModalEditConfig

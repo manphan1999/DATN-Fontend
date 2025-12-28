@@ -64,7 +64,7 @@ const App = () => {
         </ThemeProvider>
       </ColorModeContext.Provider>
       <ToastContainer
-        position="top-right"
+        position="top-center"
         autoClose={1500}
         hideProgressBar
         newestOnTop

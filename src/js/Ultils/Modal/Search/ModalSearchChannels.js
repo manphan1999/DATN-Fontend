@@ -5,7 +5,7 @@ import {
     Loading, useValidator, socket, CustomDataGrid
 } from '../../../ImportComponents/Imports';
 import {
-    fetchAllChannels, createNewHistorical, createTableMySQL, createTableSQL,
+    fetchAllChannels, createNewHistorical, createTableMySQL, createTableSQL, createPublish
 } from '../../../../Services/APIDevice';
 
 const ModalSearchChannels = (props) => {
@@ -176,6 +176,18 @@ const ModalSearchChannels = (props) => {
             return;
         }
 
+        if (action === 'MQTT') {
+            const res = await createPublish(selectedData);
+            if (res && res.EC === 0) {
+                console.log('socket.connected =', socket.connected);
+                socket.emit('CHANGE PUBLISH');
+                toast.success(res.EM);
+                handleClose();
+            } else {
+                toast.error(res.EM);
+            }
+            return;
+        }
 
         const res = await createNewHistorical(selectedData)
         if (res && res.EC === 0) {

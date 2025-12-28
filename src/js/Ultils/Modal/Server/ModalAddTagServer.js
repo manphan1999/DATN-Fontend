@@ -281,11 +281,11 @@ const ModalAddTagServer = (props) => {
                             label="Data Type"
                             value={dataServer.dataType ?? ""}
                             variant="standard"
-                            sx={(action === 'CREATE TCP' || action === 'UPDATE TCP') ? {
+                            sx={{
                                 gridColumn: 'span 2',
                                 justifySelf: 'center',
                                 width: '50%'
-                            } : {}}
+                            }}
                             //      sx={{ gridColumn: 'span 2', justifySelf: 'center', width: '50%' }}
                             onChange={(e) => handleOnchangeInput(e.target.value, 'dataType')}
                             error={!!errors.dataType}

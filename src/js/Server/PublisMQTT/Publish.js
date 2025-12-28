@@ -24,6 +24,26 @@ const ListPublishMqtt = () => {
     const [dataEditConfig, setDataEditConfig] = useState([]);
     const [selectedRows, setSelectedRows] = useState([]);
 
+    useEffect(() => {
+        fetchTagPublish();
+    }, []);
+
+    const fetchTagPublish = async () => {
+        setLoading(true);
+        let response = await fetchAllPublish();
+        if (response && response.EC === 0 && Array.isArray(response.DT?.DT)) {
+            const rowsWithId = response.DT.DT.map((item) => ({
+                id: item._id,
+                name: item.name,
+                channel: item.channel,
+                symbol: item.symbol,
+                unit: item.unit,
+            }));
+            setListPublishMqtt(rowsWithId);
+        }
+        setLoading(false);
+    };
+
     const handleOpenModalAddConfig = () => {
         setActionConfig('CREATE');
         setReloadDataConfig(false);
@@ -42,7 +62,7 @@ const ListPublishMqtt = () => {
         setOpenModalAddTag(true);
     }
 
-    const handleCloseModalAddTag = () => { setOpenModalAddTag(false); }
+    const handleCloseModalAddTag = () => { setOpenModalAddTag(false); fetchTagPublish(); }
     const handleCloseModalAddConfigMQTT = () => { setOpenModalAddConfigMQTT(false); setReloadDataConfig(true); }
     const handleCloseModalDelete = () => { setIsShowModalDelete(false); }
 
@@ -51,33 +71,35 @@ const ListPublishMqtt = () => {
     }
     const handleCloseModalConfig = () => { setOpenModalConfig(false); setReloadDataConfig(false); }
 
-    // const handleDeletePublish = (PublishMqtt) => {
-    //     let dataToDelete = [];
-    //     if (PublishMqtt) {
-    //         dataToDelete = [{ id: PublishMqtt.id }];
-    //         setSelectedCount(1);
-    //     } else {
-    //         dataToDelete = listPublishMqtt
-    //             .filter(item => selectedRows.includes(item.id))
-    //             .map(item => ({ id: item.id }));
-    //         setSelectedCount(dataToDelete.length);
-    //     }
-    //     setDataModalDelete(dataToDelete);
-    //     setIsShowModalDelete(true);
-    //     setActionDelete('MQTT');
-    // };
+    const handleDeletePublish = (PublishMqtt) => {
+        let dataToDelete = [];
+        if (PublishMqtt) {
+            dataToDelete = [{ id: PublishMqtt.id }];
+            setSelectedCount(1);
+        } else {
+            dataToDelete = listPublishMqtt
+                .filter(item => selectedRows.includes(item.id))
+                .map(item => ({ id: item.id }));
+            setSelectedCount(dataToDelete.length);
+        }
+        setDataModalDelete(dataToDelete);
+        setIsShowModalDelete(true);
+        setActionDelete('MQTT');
+    };
 
-    // const conformDeletePublish = async () => {
-    //     let res = await deletePublish({ list: dataModalDelete });
-    //     let serverData = res;
+    const conformDeletePublish = async () => {
+        let res = await deletePublish({ list: dataModalDelete });
+        let serverData = res;
 
-    //     if (+serverData.EC === 0) {
-    //         toast.success(serverData.EM);
-    //         setIsShowModalDelete(false);
-    //     } else {
-    //         toast.error(serverData.EM);
-    //     }
-    // };
+        if (+serverData.EC === 0) {
+            socket.emit('CHANGE PUBLISH');
+            toast.success(serverData.EM);
+            setIsShowModalDelete(false);
+            fetchTagPublish();
+        } else {
+            toast.error(serverData.EM);
+        }
+    };
 
     const handleDeleteConfig = (config) => {
         setReloadDataConfig(false);
@@ -96,6 +118,7 @@ const ListPublishMqtt = () => {
         let serverData = res;
 
         if (+serverData.EC === 0) {
+            socket.emit('CHANGE PUBLISH');
             toast.success(serverData.EM);
             setIsShowModalDelete(false);
             setReloadDataConfig(true);
@@ -138,33 +161,24 @@ const ListPublishMqtt = () => {
     }
 
     const columns = [
-        { field: 'deviceName', headerName: 'Device', flex: 1, align: 'center', headerAlign: 'center' },
-        { field: 'topic', headerName: 'Topic', flex: 1, align: 'center', headerAlign: 'center' },
-        { field: 'controlQoS', headerName: 'QoS', flex: 1, align: 'center', headerAlign: 'center' },
-        { field: 'controlRetain', headerName: 'Retain', flex: 1, align: 'center', headerAlign: 'center' },
+        { field: 'channel', headerName: 'Channel', flex: 1, width: 80, align: 'center', headerAlign: 'center' },
+        { field: 'name', headerName: 'Name', flex: 1, width: 200, align: 'center', headerAlign: 'center' },
+        { field: 'symbol', headerName: 'Symbol', flex: 1, width: 100, align: 'center', headerAlign: 'center' },
+        { field: 'unit', headerName: 'Unit', flex: 1, width: 100, align: 'center', headerAlign: 'center' },
         {
             field: 'action',
             headerName: 'Action',
-            width: 190,
+            flex: 1,
             headerAlign: 'center', align: 'center',
             renderCell: (params) => (
                 <>
                     <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 1, height: '100%', }}  >
                         <Button
                             variant="contained"
-                            color="primary"
-                            startIcon={<BorderColorIcon />}
-                            sx={{ textTransform: 'none', minWidth: 80 }}
-                        // onClick={(e) => { e.stopPropagation(); handleOpenModalEditConfig(params.row); }}
-                        >
-                            Sửa
-                        </Button>
-                        <Button
-                            variant="contained"
                             color="error"
                             startIcon={<DeleteForeverIcon />}
                             sx={{ textTransform: 'none', minWidth: 80 }}
-                        //    onClick={(e) => { e.stopPropagation(); handleDeletePublish(params.row); }}
+                            onClick={(e) => { e.stopPropagation(); handleDeletePublish(params.row); }}
                         >
                             Xóa
                         </Button>
@@ -177,7 +191,7 @@ const ListPublishMqtt = () => {
 
     return (
         <div>
-            {listPublishMqtt.length >= 0 && (
+            {/* {listPublishMqtt.length >= 0 && (
                 <Grid
                     container
                     columnSpacing={55}
@@ -223,14 +237,14 @@ const ListPublishMqtt = () => {
                         </Button>
                     </Grid>
                 </Grid>
-            )}
+            )} */}
 
             <Box sx={{ height: 30, display: 'flex', alignItems: 'center', pb: 2 }}  >
                 <Button
                     variant="contained"
                     color="error"
                     startIcon={<DeleteForeverIcon />}
-                    // onClick={(e) => { e.stopPropagation(); handleDeletePublish(); }}
+                    onClick={(e) => { e.stopPropagation(); handleDeletePublish(); }}
                     sx={{ textTransform: 'none', visibility: selectedCount > 1 ? 'visible' : 'hidden', }}
                 >
                     Xóa nhiều
@@ -301,6 +315,7 @@ const ListPublishMqtt = () => {
                 selectedCount={selectedCount}
                 action={actionDelete}
                 conformDeleteConfig={conformDeleteConfig}
+                conformDeletePublish={conformDeletePublish}
             />
 
         </div>
