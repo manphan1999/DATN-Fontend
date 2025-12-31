@@ -1,6 +1,6 @@
 import AppRoutes from './js/routes/AppRoutes';
 import {
-  ToastContainer, Bounce, useState, useMemo, useEffect,
+  ToastContainer, Flip, useState, useMemo, useEffect,
   ThemeProvider, createTheme, CssBaseline, socket
 } from '../src/js/ImportComponents/Imports';
 import { BrowserRouter as Router } from "react-router-dom";
@@ -63,7 +63,22 @@ const App = () => {
           </Router>
         </ThemeProvider>
       </ColorModeContext.Provider>
+
       <ToastContainer
+        position="top-center"
+        autoClose={1000}
+        hideProgressBar
+        newestOnTop
+        closeOnClick={false}
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="light"
+        transition={Flip}
+      />
+
+      {/* <ToastContainer
         position="top-center"
         autoClose={1500}
         hideProgressBar
@@ -75,9 +90,7 @@ const App = () => {
         pauseOnHover
         theme="colored"
         transition={Bounce}
-      />
-
-
+      /> */}
     </>
   );
 }

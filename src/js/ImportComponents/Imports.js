@@ -94,7 +94,7 @@ export { DemoContainer } from '@mui/x-date-pickers/internals/demo';
 export { DataGrid } from '@mui/x-data-grid';
 export { default as Chart } from "react-apexcharts";
 
-export { ToastContainer, toast, Bounce } from 'react-toastify';
+export { ToastContainer, toast, Bounce, Flip } from 'react-toastify';
 //export { default as toast } from 'react-hot-toast';
 export { default as _ } from 'lodash';
 export { default as dayjs } from 'dayjs';
